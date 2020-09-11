@@ -1,0 +1,6 @@
+---
+# tasks file for ansible-role-irods
+
+- name: Molecule Hello World!
+  debug:
+    msg: Hello, World!
