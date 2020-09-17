@@ -1,6 +1,121 @@
 ---
 # tasks file for ansible-role-irods
 
-- name: Molecule Hello World!
-  debug:
-    msg: Hello, World!
+- name: setup iRODS CentOS Yum repository
+  yum_repository:
+    name: "renci-irods"
+    description: "RENCI iRODS Repository"
+    baseurl: "https://packages.irods.org/yum/pool/centos$releasever/$basearch"
+    enabled: true
+    gpgkey: "https://packages.irods.org/irods-signing-key.asc"
+    gpgcheck: true
+
+- name: Install Database packages
+  package:
+    pkg:
+      - postgresql-server
+      - postgresql-odbc
+      - python-psycopg2 # needed for ansible postgresql_user module
+  when: ansible_role_irods_is_catalog
+
+- name: Check if we need to initialize database server
+  command: "test -f /var/lib/pgsql/data/PG_VERSION"
+  register: pgsql_initialized
+  failed_when: false
+  changed_when: pgsql_initialized.rc != 0
+  when: ansible_role_irods_is_catalog
+
+- name: Initialize database server
+  command: "postgresql-setup initdb"
+  ignore_errors: true
+  when:
+    - ansible_role_irods_is_catalog
+    - pgsql_initialized.changed
+
+- name: configure PostgreSQL access
+  postgresql_pg_hba:
+    dest: "/var/lib/pgsql/data/pg_hba.conf"
+    contype: host
+    address: samehost
+    method: md5
+  when: ansible_role_irods_is_catalog
+
+- name: Start database server
+  systemd:
+    name: postgresql
+    state: restarted
+    enabled: true
+  when: ansible_role_irods_is_catalog
+
+- name: Add database
+  postgresql_db:
+    name: "{{ irods_db_name }}"
+  become_user: postgres
+  become: true
+  when: ansible_role_irods_is_catalog
+
+- name: Add irods user to database server
+  postgresql_user:
+    db: "{{ irods_db_name }}"
+    name: "{{ irods_db_username }}"
+    password: "{{ irods_db_password }}"
+    priv: "ALL"
+  no_log: true
+  become_user: postgres
+  become: true
+  when: ansible_role_irods_is_catalog
+
+- name: Create iRODS service account
+  user:
+    name: "irods"
+    home: "/var/lib/irods"
+    comment: "iRODS Administrator"
+    password: "!"
+
+- name: Install iRODS server packages
+  package:
+    pkg:
+      - irods-server
+      - irods-database-plugin-postgres
+
+- name: iRODS server configuration file
+  template:
+    src: "templates/server_config.json.j2"
+    dest: "/etc/irods/server_config.json"
+    mode: 0600
+    owner: irods
+    group: irods
+
+- name: iRODS service account environment directory
+  file:
+    path: "/var/lib/irods/.irods"
+    state: directory
+    mode: 0700
+    owner: irods
+    group: irods
+
+- name: iRODS service account environment file
+  template:
+    src: "templates/service_account_irods_environment.json.j2"
+    dest: "/var/lib/irods/.irods/irods_environment.json"
+    mode: 0600
+    owner: irods
+    group: irods
+
+- name: iRODS server setup file
+  template:
+    src: "templates/setup_irods.json.j2"
+    dest: "/etc/irods/setup_irods.json"
+    mode: 0600
+    owner: irods
+    group: irods
+
+- name: Check if we need to initialize iRODS distribution
+  command: "test -f /var/lib/irods/VERSION.json"
+  register: irods_initialized
+  failed_when: false
+  changed_when: irods_initialized.rc != 0
+
+- name: Initialize iRODS distribution
+  command: "python /var/lib/irods/scripts/setup_irods.py --json_configuration_file=/etc/irods/setup_irods.json"
+  when: irods_initialized.changed

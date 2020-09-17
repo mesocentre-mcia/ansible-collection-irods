@@ -1,2 +1,29 @@
 ---
 # defaults file for ansible-role-irods
+
+irods_zone_name: "demoZone" 
+irods_catalog_provider_hosts: ["localhost"]
+irods_default_resource_name: "demoResc"
+
+irods_cs_ssl: false
+
+# irods_database_user_password_salt: "MUST_TO_BE_SET"
+# irods_negotiation_key: "MUST_TO_BE_SET_WITH_A_32_BYTES_LONG_STRING"
+# irods_db_password: "MUST_BE_SET"
+# irods_server_control_plane_key: "MUST_BE_SET_WITH_A_32_BYTES_LONG_STRING"
+# irods_zone_key: "MUST_BE_SET" 
+
+irods_db_host: "localhost"
+irods_db_name: "ICAT"
+irods_db_odbc_driver: "PostgreSQL"
+irods_db_port: 5432
+irods_db_username: "irods"
+
+irods_server_control_plane_port: 1248
+irods_xmsg_port: 1279
+
+irods_server_port_range_start: 20000
+irods_server_port_range_end: 20199
+
+irods_zone_port: 1247
+irods_zone_user: "rods"

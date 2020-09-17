@@ -5,3 +5,10 @@
     - name: "Include ansible-role-irods"
       include_role:
         name: "ansible-role-irods"
+      vars:
+        irods_catalog_provider_hosts: ['localhost']
+        irods_database_user_password_salt: "VERY_SECRET_SALT"
+        irods_negotiation_key: "09876543210987654321098765432109"
+        irods_db_password: "VERY_SECRET_PASSWORD"
+        irods_server_control_plane_key: "12345678901234567890123456789012"
+        irods_zone_key: "VERY_SECRET_KEY"

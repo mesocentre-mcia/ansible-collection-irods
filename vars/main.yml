@@ -1,2 +1,4 @@
 ---
 # vars file for ansible-role-irods
+
+ansible_role_irods_is_catalog: "{{ inventory_hostname in irods_catalog_provider_hosts or 'localhost' in irods_catalog_provider_hosts }}"

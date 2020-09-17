@@ -1,0 +1,16 @@
+{
+  "admin_password": "test",
+   "host_access_control_config": {
+     "access_entries": []
+   },
+   "host_system_information": {
+     "service_account_user_name": "irods",
+     "service_account_group_name": "irods"
+   },
+   "hosts_config": {
+      "host_entries": []
+   },
+  "server_config": {% include "server_config.json.j2" %},
+  "service_account_environment": {% include "service_account_irods_environment.json.j2" %}
+}
+
