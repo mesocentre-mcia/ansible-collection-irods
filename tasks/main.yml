@@ -1,6 +1,43 @@
 ---
 # tasks file for ansible-role-irods
 
+# ICAT settings
+- name: Setup Catalog Database
+  include_role:
+    name: geerlingguy.postgresql
+    apply:
+      become: yes
+  vars:
+    postgresql_databases:
+      - name: "{{ irods_db_name }}"
+    postgresql_users:
+      - name: "{{ irods_db_username }}"
+#        db: "{{ irods_db_name }}" # chicken and eggs problem with postgresql_databases
+#        priv: "ALL"
+        password: "{{ irods_db_password }}"
+    postgres_users_no_log: true
+  when: ansible_role_irods_is_catalog
+
+- name: Add irods user to database
+  postgresql_privs:
+    db: "{{ irods_db_name }}"
+    roles: "{{ irods_db_username }}"
+    password: "{{ irods_db_password }}"
+    type: database
+    privs: "ALL"
+  no_log: true
+  become_user: postgres
+  become: true
+  when: ansible_role_irods_is_catalog
+
+# iRODS server settings
+- name: Create iRODS service account
+  user:
+    name: "irods"
+    home: "/var/lib/irods"
+    comment: "iRODS Administrator"
+    password: "!"
+
 - name: setup iRODS CentOS Yum repository
   yum_repository:
     name: "renci-irods"
@@ -9,68 +46,6 @@
     enabled: true
     gpgkey: "https://packages.irods.org/irods-signing-key.asc"
     gpgcheck: true
-
-- name: Install Database packages
-  package:
-    pkg:
-      - postgresql-server
-      - postgresql-odbc
-      - python-psycopg2 # needed for ansible postgresql_user module
-  when: ansible_role_irods_is_catalog
-
-- name: Check if we need to initialize database server
-  command: "test -f /var/lib/pgsql/data/PG_VERSION"
-  register: pgsql_initialized
-  failed_when: false
-  changed_when: pgsql_initialized.rc != 0
-  when: ansible_role_irods_is_catalog
-
-- name: Initialize database server
-  command: "postgresql-setup initdb"
-  ignore_errors: true
-  when:
-    - ansible_role_irods_is_catalog
-    - pgsql_initialized.changed
-
-- name: configure PostgreSQL access
-  postgresql_pg_hba:
-    dest: "/var/lib/pgsql/data/pg_hba.conf"
-    contype: host
-    address: samehost
-    method: md5
-  when: ansible_role_irods_is_catalog
-
-- name: Start database server
-  systemd:
-    name: postgresql
-    state: restarted
-    enabled: true
-  when: ansible_role_irods_is_catalog
-
-- name: Add database
-  postgresql_db:
-    name: "{{ irods_db_name }}"
-  become_user: postgres
-  become: true
-  when: ansible_role_irods_is_catalog
-
-- name: Add irods user to database server
-  postgresql_user:
-    db: "{{ irods_db_name }}"
-    name: "{{ irods_db_username }}"
-    password: "{{ irods_db_password }}"
-    priv: "ALL"
-  no_log: true
-  become_user: postgres
-  become: true
-  when: ansible_role_irods_is_catalog
-
-- name: Create iRODS service account
-  user:
-    name: "irods"
-    home: "/var/lib/irods"
-    comment: "iRODS Administrator"
-    password: "!"
 
 - name: Install iRODS server packages
   package:
@@ -115,8 +90,6 @@
     mode: 0700
     owner: irods
     group: irods
-  notify:
-    - restart irods
 
 - name: iRODS service account environment file
   template:
