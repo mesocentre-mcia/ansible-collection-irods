@@ -1,4 +1,6 @@
 ---
+image: quay.io/ansible/molecule:3.0.8
+
 stages:
   - test
 
@@ -11,15 +13,13 @@ cache:
     - .pip/
 
 before_script:
-  - python -V
-  - pip install ansible molecule docker
+  - python3 -V
+  - pip3 install ansible molecule docker
   - ansible --version
   - molecule --version
   - docker --version
 
 molecule:
   stage: test
-  tags:
-    - molecule-jobs
   script:
     - molecule test
