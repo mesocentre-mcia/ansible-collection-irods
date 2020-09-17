@@ -1,0 +1,25 @@
+---
+stages:
+  - test
+
+variables:
+  PIP_CACHE_DIR: "$CI_PROJECT_DIR/.pip"
+  GIT_STRATEGY: clone
+
+cache:
+  paths:
+    - .pip/
+
+before_script:
+  - python -V
+  - pip install ansible molecule docker
+  - ansible --version
+  - molecule --version
+  - docker --version
+
+molecule:
+  stage: test
+  tags:
+    - molecule-jobs
+script:
+  - molecule test
