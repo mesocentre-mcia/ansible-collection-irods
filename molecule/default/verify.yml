@@ -1,9 +1,30 @@
 ---
-# This is an example playbook to execute Ansible tests.
+# iRODS role verification
 
-- name: Verify
+- name: Verify simple iput/iget commands
   hosts: all
   tasks:
-  - name: Example assertion
-    assert:
-      that: true
+    - name: test iput
+      command: "iput -f /var/lib/irods/VERSION.json"
+      register: verify_iput
+      become: yes
+      become_user: irods
+      changed_when: false
+    - name: test iget
+      command: "iget -f VERSION.json /tmp"
+      register: verify_iget
+      become: yes
+      become_user: irods
+      changed_when: false
+    - name: tset iget/iput results
+      command: "cmp /var/lib/irods/VERSION.json /tmp/VERSION.json"
+      register: verify_igetiput_diff
+      become: yes
+      become_user: irods
+      changed_when: false
+    - name: assertions
+      assert:
+        that:
+          - verify_iput.rc == 0
+          - verify_iget.rc == 0
+          - verify_igetiput_diff.rc == 0
