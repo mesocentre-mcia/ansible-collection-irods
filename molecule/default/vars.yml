@@ -1,0 +1,4 @@
+---
+# scenario common variables
+
+irods_version: 4.2.7

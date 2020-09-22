@@ -5,6 +5,9 @@ irods_zone_name: "demoZone"
 irods_catalog_provider_hosts: ["localhost"]
 irods_default_resource_name: "demoResc"
 
+# set null for latest version
+irods_version: null
+
 irods_cs_ssl: false
 
 # irods_admin_password: "MUST_TO_BE_SET"

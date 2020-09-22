@@ -50,8 +50,8 @@
 - name: Install iRODS server packages
   package:
     pkg:
-      - irods-server
-      - irods-database-plugin-postgres
+      - "irods-server{{ irods_package_extension }}"
+      - "irods-database-plugin-postgres{{ irods_package_extension }}"
 
 - name: iRODS various directories ownership
   file:
