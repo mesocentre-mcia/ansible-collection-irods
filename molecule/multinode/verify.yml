@@ -1,0 +1,30 @@
+---
+# iRODS role verification
+
+- name: Verify simple iput/iget commands
+  hosts: all
+  tasks:
+    - name: test iput
+      command: "iput -f /var/lib/irods/VERSION.json {{ inventory_hostname }}-VERSION.json"
+      register: verify_iput
+      become: yes
+      become_user: irods
+      changed_when: false
+    - name: test iget
+      command: "iget -f {{ inventory_hostname }}-VERSION.json /tmp/VERSION.json"
+      register: verify_iget
+      become: yes
+      become_user: irods
+      changed_when: false
+    - name: tset iget/iput results
+      command: "cmp /var/lib/irods/VERSION.json /tmp/VERSION.json"
+      register: verify_igetiput_diff
+      become: yes
+      become_user: irods
+      changed_when: false
+    - name: assertions
+      assert:
+        that:
+          - verify_iput.rc == 0
+          - verify_iget.rc == 0
+          - verify_igetiput_diff.rc == 0

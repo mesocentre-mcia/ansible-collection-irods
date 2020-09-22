@@ -6,8 +6,8 @@
       include_role:
         name: "ansible-role-irods"
       vars:
-        irods_catalog_provider_hosts: ["instance"]
-        irods_hosts: ["instance"]
+        irods_catalog_provider_hosts: ['icat']
+        irods_hosts: ['icat', 'irods0']
         irods_admin_password: "VERY_SECRET_ADMIN_PASSWORD"
         irods_database_user_password_salt: "VERY_SECRET_SALT"
         irods_negotiation_key: "09876543210987654321098765432109"
