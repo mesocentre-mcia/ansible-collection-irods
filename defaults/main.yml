@@ -7,6 +7,7 @@ irods_default_resource_name: "demoResc"
 
 irods_cs_ssl: false
 
+# irods_admin_password: "MUST_TO_BE_SET"
 # irods_database_user_password_salt: "MUST_TO_BE_SET"
 # irods_negotiation_key: "MUST_TO_BE_SET_WITH_A_32_BYTES_LONG_STRING"
 # irods_db_password: "MUST_BE_SET"

@@ -1,7 +1,7 @@
 ---
 # tasks file for ansible-role-irods
 
-# ICAT settings
+# ICAT database settings
 - name: Setup Catalog Database
   include_role:
     name: geerlingguy.postgresql
@@ -53,6 +53,20 @@
       - irods-server
       - irods-database-plugin-postgres
 
+- name: iRODS various directories ownership
+  file:
+    path: "{{ item }}"
+    state: directory
+    mode: 0755
+    owner: irods
+    group: irods
+  loop:
+    - "/etc/irods"
+    - "/var/lib/irods"
+    - "/var/lib/irods/log"
+  notify:
+    - restart irods
+
 - name: iRODS server setup file
   template:
     src: "templates/setup_irods.json.j2"
@@ -60,6 +74,7 @@
     mode: 0600
     owner: irods
     group: irods
+  when: ansible_role_irods_is_catalog
 
 - name: Check if we need to initialize iRODS distribution
   command: "test -f /var/lib/irods/VERSION.json"
@@ -67,16 +82,54 @@
   failed_when: false
   changed_when: irods_initialized.rc != 0
 
-- name: Initialize iRODS distribution
+# do this first because it's nice to have a running catalog when you want to start a resource server
+- name: Initialize iRODS distribution for IES (catalog server)
   command: "python /var/lib/irods/scripts/setup_irods.py --json_configuration_file=/etc/irods/setup_irods.json"
-  when: irods_initialized.rc != 0
-  notify:
-    - restart irods
+  when:
+    - irods_initialized.rc != 0
+    - ansible_role_irods_is_catalog
+
+# for non-IES, mimic setup_irods.py except for creating default resources with fixed path
+- name: Initialize iRODS distribution for non-IES (resource only server)
+  command: "cp /var/lib/irods/VERSION.json.dist /var/lib/irods/VERSION.json"
+  when:
+    - irods_initialized.rc != 0
+    - not ansible_role_irods_is_catalog
 
 - name: iRODS server configuration file
   template:
     src: "templates/server_config.json.j2"
     dest: "/etc/irods/server_config.json"
+    mode: 0600
+    owner: irods
+    group: irods
+  notify:
+    - restart irods
+
+- name: iRODS hosts configuration file
+  template:
+    src: "templates/hosts_config.json.j2"
+    dest: "/etc/irods/hosts_config.json"
+    mode: 0600
+    owner: irods
+    group: irods
+  notify:
+    - restart irods
+
+- name: iRODS host acces control configuration file
+  template:
+    src: "templates/host_access_control_config.json.j2"
+    dest: "/etc/irods/host_access_control_config.json"
+    mode: 0600
+    owner: irods
+    group: irods
+  notify:
+    - restart irods
+
+- name: iRODS service_account configuration file
+  template:
+    src: "templates/service_account.config.j2"
+    dest: "/etc/irods/service_account.config"
     mode: 0600
     owner: irods
     group: irods
@@ -96,6 +149,27 @@
     src: "templates/service_account_irods_environment.json.j2"
     dest: "/var/lib/irods/.irods/irods_environment.json"
     mode: 0600
+    owner: irods
+    group: irods
+  notify:
+    - restart irods
+
+- name: Initialize iRODS admin password in service account environment
+  shell:
+    cmd: "iinit {{ irods_admin_password }} || test $? -eq 2"
+    # return code 2 is ok (irods server not reached, but password written)
+    creates: "/var/lib/irods/.irods/.irodsA"
+  become: true
+  become_user: irods
+  no_log: true
+  notify:
+    - restart irods
+
+- name: iRODS control script
+  file:
+    path: "/var/lib/irods/irodsctl"
+    state: file
+    mode: 0755
     owner: irods
     group: irods
   notify:

@@ -1,0 +1,13 @@
+{
+  "host_entries": [
+  {% for host in irods_hosts %}{{ ',' if host != irods_hosts[0] else '' }}
+    {
+      "address_type" : "{{ 'local' if host == inventory_hostname else 'remote' }}",
+      "addresses" : [
+        {"address" : "{{ hostvars[host]['ansible_default_ipv4']['address'] }}"},
+        {"address" : "{{ host }}"}
+      ]
+    } 
+  {% endfor %}
+  ]
+}
