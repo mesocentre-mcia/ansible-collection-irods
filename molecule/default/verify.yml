@@ -1,6 +1,23 @@
 ---
 # iRODS role verification
 
+- name: Verify iRODS package version
+  hosts: all
+  tasks:
+    - name: "include scenario common variables"
+      include_vars: "vars.yml"
+    - name: "test if iRODS version is {{ irods_version }}"
+      shell:
+        cmd: "ienv | grep irods_version | awk '{print $3}'"
+      register: verify_version
+      become: yes
+      become_user: irods
+      changed_when: false
+    - name: assertions
+      assert:
+        that:
+          - verify_version.stdout == "{{ irods_version }}"
+
 - name: Verify simple iput/iget commands
   hosts: all
   tasks:

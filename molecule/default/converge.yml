@@ -2,6 +2,8 @@
 - name: Converge
   hosts: all
   tasks:
+    - name: "include scenario common variables"
+      include_vars: "vars.yml"
     - name: "Include ansible-role-irods"
       include_role:
         name: "ansible-role-irods"
