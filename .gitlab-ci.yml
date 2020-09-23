@@ -22,4 +22,4 @@ before_script:
 molecule:
   stage: test
   script:
-    - molecule test
+    - molecule test --all
