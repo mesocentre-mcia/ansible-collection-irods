@@ -82,6 +82,21 @@
   failed_when: false
   changed_when: irods_initialized.rc != 0
 
+- name: Check SSL certificate availability
+  file:
+    path: "{{ item.path }}"
+    mode: "{{ item.mode }}"
+    owner: irods
+    group: irods
+  loop:
+    - {"path": "{{ irods_ssl_certificate_chain_file }}", "mode": "0644"}
+    - {"path": "{{ irods_ssl_certificate_key_file }}", "mode": "0600"}
+    - {"path": "{{ irods_ssl_ca_certificate_file }}", "mode": "0644"}
+  notify:
+    - restart irods
+  when:
+    - irods_cs_ssl
+
 # do this first because it's nice to have a running catalog when you want to start a resource server
 - name: Initialize iRODS distribution for IES (catalog server)
   command: "python /var/lib/irods/scripts/setup_irods.py --json_configuration_file=/etc/irods/setup_irods.json"

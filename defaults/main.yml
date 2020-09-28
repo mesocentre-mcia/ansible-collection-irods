@@ -31,3 +31,9 @@ irods_server_port_range_end: 20199
 
 irods_zone_port: 1247
 irods_zone_user: "rods"
+
+irods_ssl_default_directory: "/etc/irods/certs"
+irods_ssl_certificate_chain_file: "{{ irods_ssl_default_directory }}/server.crt"
+irods_ssl_certificate_key_file: "{{ irods_ssl_default_directory }}/server.key"
+irods_ssl_verify_server: "hostname"
+irods_ssl_ca_certificate_file: "{{ irods_ssl_default_directory }}/ca.crt"
