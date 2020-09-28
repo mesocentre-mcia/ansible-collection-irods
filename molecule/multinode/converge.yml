@@ -2,6 +2,13 @@
 - name: Converge
   hosts: all
   tasks:
+    # prepare hosts for SSL setup with self-signed certificates
+    - name: "Include ansible-role-irods"
+      include_role:
+        name: "ansible-role-irods"
+        tasks_from: "create_selfsigned_certificates.yml"
+
+    # run irods role
     - name: "Include ansible-role-irods"
       include_role:
         name: "ansible-role-irods"
@@ -14,3 +21,4 @@
         irods_db_password: "VERY_SECRET_PASSWORD"
         irods_server_control_plane_key: "12345678901234567890123456789012"
         irods_zone_key: "VERY_SECRET_KEY"
+        irods_cs_ssl: true
