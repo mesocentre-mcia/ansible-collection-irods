@@ -1,15 +1,23 @@
 ---
 # 
 
-- name: Put known hosts into /etc/hosts
+- name: Provide irods_etc_hosts definitions
   vars:
-    irods_all_hosts: "{{ ([irods_db_host] + irods_hosts) | reject('eq', 'localhost') | unique | list }}"
-    irods_all_ips: "{{ irods_all_hosts | map('extract', hostvars, ['ansible_default_ipv4', 'address']) | list }}"
-    irods_all_hostips: "{{ dict(irods_all_hosts | zip( irods_all_ips) | list) }}"
+    all_hosts: "{{ ([irods_db_host] + irods_hosts) | reject('eq', 'localhost') | unique | list }}"
+  set_fact:
+    irods_etc_hosts: >-
+      {{ irods_etc_hosts | default([]) +
+      [ {'hostname' : item,
+         'ip' : hostvars[item].ansible_default_ipv4.address,
+         'fqdn' : hostvars[item].ansible_facts.hostnqn},
+      ] }}
+  loop: "{{ all_hosts }}"
+
+- name: Put irods_etc_hosts into /etc/hosts
+  vars:
 
   lineinfile:
     path: "/etc/hosts"
-    regexp: "^{{ item.1 }}\\s+{{ item.0 }}$"
-    line: "{{ item.1 }} {{ item.0 }}"
     unsafe_writes: true # avoid problems with systemd/docker mounted file
-  loop: "{{ irods_all_hostips.items() |list }}"
+    line: "{{ item.ip }} {{ item.fqdn }} {{ item.hostname }}"
+  loop: "{{ irods_etc_hosts }}"
