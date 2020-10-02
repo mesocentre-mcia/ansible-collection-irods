@@ -1,35 +1,6 @@
 ---
 # tasks file for ansible-role-irods
 
-# ICAT database settings
-- name: Setup Catalog Database
-  include_role:
-    name: geerlingguy.postgresql
-    apply:
-      become: yes
-  vars:
-    postgresql_databases:
-      - name: "{{ irods_db_name }}"
-    postgresql_users:
-      - name: "{{ irods_db_username }}"
-#        db: "{{ irods_db_name }}" # chicken and eggs problem with postgresql_databases
-#        priv: "ALL"
-        password: "{{ irods_db_password }}"
-    postgres_users_no_log: true
-  when: ansible_role_irods_is_catalog
-
-- name: Add irods user to database
-  postgresql_privs:
-    db: "{{ irods_db_name }}"
-    roles: "{{ irods_db_username }}"
-    password: "{{ irods_db_password }}"
-    type: database
-    privs: "ALL"
-  no_log: true
-  become_user: postgres
-  become: true
-  when: ansible_role_irods_is_catalog
-
 # iRODS server settings
 - name: Create iRODS service account
   user:

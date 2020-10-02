@@ -1,0 +1,18 @@
+---
+# PostgreSQL server database setup
+
+- name: Create iRODS database
+  postgresql_db:
+    name: "{{ irods_db_name }}"
+  become_user: postgres
+  become: true
+
+- name: Add irods user to iRODS database
+  postgresql_user:
+    db: "{{ irods_db_name }}"
+    name: "{{ irods_db_username }}"
+    password: "{{ irods_db_password }}"
+    priv: "ALL"
+  no_log: true
+  become_user: postgres
+  become: true

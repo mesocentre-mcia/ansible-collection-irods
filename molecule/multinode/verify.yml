@@ -16,7 +16,7 @@
       become: yes
       become_user: irods
       changed_when: false
-    - name: tset iget/iput results
+    - name: test iget/iput results (cmp)
       command: "cmp /var/lib/irods/VERSION.json /tmp/VERSION.json"
       register: verify_igetiput_diff
       become: yes
