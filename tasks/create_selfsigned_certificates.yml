@@ -9,14 +9,17 @@
     - "{{ irods_ssl_certificate_key_file }}"
     - "{{ irods_ssl_certificate_chain_file }}"
     - "{{ irods_ssl_ca_certificate_file }}"
+
 - name: "Generate an OpenSSL private key with the default values (4096 bits, RSA)"
   community.crypto.openssl_privatekey:
     path: "{{ irods_ssl_certificate_key_file }}"
+
 - name: Generate an OpenSSL Certificate Signing Request
   community.crypto.openssl_csr:
     path: "/tmp/server.csr"
     privatekey_path: "{{ irods_ssl_certificate_key_file }}"
     common_name: "{{ inventory_hostname }}"
+
 - name: Generate a Self Signed OpenSSL certificate
   community.crypto.x509_certificate:
     path: "{{ irods_ssl_certificate_chain_file }}"
