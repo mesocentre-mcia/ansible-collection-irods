@@ -14,8 +14,6 @@
   loop: "{{ all_hosts }}"
 
 - name: Put irods_etc_hosts into /etc/hosts
-  vars:
-
   lineinfile:
     path: "/etc/hosts"
     unsafe_writes: true # avoid problems with systemd/docker mounted file
