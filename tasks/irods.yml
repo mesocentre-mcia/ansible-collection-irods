@@ -1,0 +1,80 @@
+---
+
+- name: iRODS server configuration file
+  template:
+    src: "templates/server_config.json.j2"
+    dest: "/etc/irods/server_config.json"
+    mode: 0600
+    owner: irods
+    group: irods
+  notify:
+    - restart irods
+
+- name: iRODS hosts configuration file
+  template:
+    src: "templates/hosts_config.json.j2"
+    dest: "/etc/irods/hosts_config.json"
+    mode: 0600
+    owner: irods
+    group: irods
+  notify:
+    - restart irods
+
+- name: iRODS host acces control configuration file
+  template:
+    src: "templates/host_access_control_config.json.j2"
+    dest: "/etc/irods/host_access_control_config.json"
+    mode: 0600
+    owner: irods
+    group: irods
+  notify:
+    - restart irods
+
+- name: iRODS service_account configuration file
+  template:
+    src: "templates/service_account.config.j2"
+    dest: "/etc/irods/service_account.config"
+    mode: 0600
+    owner: irods
+    group: irods
+  notify:
+    - restart irods
+
+- name: iRODS service account environment directory
+  file:
+    path: "/var/lib/irods/.irods"
+    state: directory
+    mode: 0700
+    owner: irods
+    group: irods
+
+- name: iRODS service account environment file
+  template:
+    src: "templates/service_account_irods_environment.json.j2"
+    dest: "/var/lib/irods/.irods/irods_environment.json"
+    mode: 0600
+    owner: irods
+    group: irods
+  notify:
+    - restart irods
+
+- name: Initialize iRODS admin password in service account environment
+  shell:
+    cmd: "iinit {{ irods_admin_password }} || test $? -eq 2"
+    # return code 2 is ok (irods server not reached, but password written)
+    creates: "/var/lib/irods/.irods/.irodsA"
+  become: true
+  become_user: irods
+  no_log: true
+  notify:
+    - restart irods
+
+- name: iRODS control script
+  file:
+    path: "/var/lib/irods/irodsctl"
+    state: file
+    mode: 0755
+    owner: irods
+    group: irods
+  notify:
+    - restart irods
