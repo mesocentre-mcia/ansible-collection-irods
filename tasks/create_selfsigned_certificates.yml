@@ -3,12 +3,16 @@
 
 - name: create certificates directory
   file:
-    path: "{{ item | dirname }}"
+    path: "{{ item.path | dirname }}"
     state: directory
+    mode: "{{ item.mode }}"
   loop:
-    - "{{ irods_ssl_certificate_key_file }}"
-    - "{{ irods_ssl_certificate_chain_file }}"
-    - "{{ irods_ssl_ca_certificate_file }}"
+    - path: "{{ irods_ssl_certificate_key_file }}"
+      mode: 0600
+    - path: "{{ irods_ssl_certificate_chain_file }}"
+      mode: 0644
+    - path: "{{ irods_ssl_ca_certificate_file }}"
+      mode: 0644
 
 - name: "Generate an OpenSSL private key with the default values (4096 bits, RSA)"
   community.crypto.openssl_privatekey:
@@ -35,9 +39,11 @@
   copy:
     src: "/tmp/{{ item }}.crt"
     dest: "/tmp/{{ item }}.crt"
+    mode: 0644
   loop: "{{ play_hosts }}"
 - name: Gather hosts certificates into a bundle ca.crt
   assemble:
     src: "/tmp"
     regexp: "^.*\\.crt$"
     dest: "{{ irods_ssl_ca_certificate_file }}"
+    mode: 0644
