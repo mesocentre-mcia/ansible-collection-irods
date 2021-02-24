@@ -1,11 +1,15 @@
 ---
+
 dependency:
   name: galaxy
+  env:
+    ANSIBLE_ROLES_PATH: ~/.ansible/roles/
 driver:
   name: docker
 lint: |
   yamllint .
-  # exclude SSL task until https://github.com/ansible/ansible-lint/pull/642 is resolved. (ansible-lint 4.3?)
+  # exclude SSL task until https://github.com/ansible/ansible-lint/pull/642 is
+  # resolved. (ansible-lint 4.3?)
   ansible-lint --exclude=tasks/create_selfsigned_certificates.yml
 platforms:
   - name: instance

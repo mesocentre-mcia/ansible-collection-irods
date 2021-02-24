@@ -10,7 +10,7 @@
       shell:
         cmd: "ienv | grep irods_version | awk '{print $3}'"
       register: verify_version
-      become: yes
+      become: true
       become_user: irods
       changed_when: false
     - name: assertions
@@ -24,19 +24,19 @@
     - name: test iput
       command: "iput -f /var/lib/irods/VERSION.json"
       register: verify_iput
-      become: yes
+      become: true
       become_user: irods
       changed_when: false
     - name: test iget
       command: "iget -f VERSION.json /tmp"
       register: verify_iget
-      become: yes
+      become: true
       become_user: irods
       changed_when: false
     - name: tset iget/iput results
       command: "cmp /var/lib/irods/VERSION.json /tmp/VERSION.json"
       register: verify_igetiput_diff
-      become: yes
+      become: true
       become_user: irods
       changed_when: false
     - name: assertions

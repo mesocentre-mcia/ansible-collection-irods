@@ -1,7 +1,7 @@
 ---
 # defaults file for ansible-role-irods
 
-irods_zone_name: "demoZone" 
+irods_zone_name: "demoZone"
 irods_catalog_provider_hosts: ["localhost"]
 irods_default_resource_name: "demoResc"
 
@@ -15,7 +15,7 @@ irods_cs_ssl: false
 # irods_negotiation_key: "MUST_TO_BE_SET_WITH_A_32_BYTES_LONG_STRING"
 # irods_db_password: "MUST_BE_SET"
 # irods_server_control_plane_key: "MUST_BE_SET_WITH_A_32_BYTES_LONG_STRING"
-# irods_zone_key: "MUST_BE_SET" 
+# irods_zone_key: "MUST_BE_SET"
 
 irods_db_host: "localhost"
 irods_db_name: "ICAT"

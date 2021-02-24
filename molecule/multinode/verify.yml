@@ -5,21 +5,22 @@
   hosts: all
   tasks:
     - name: test iput
+      # yamllint disable-line rule:line-length
       command: "iput -f /var/lib/irods/VERSION.json {{ inventory_hostname }}-VERSION.json"
       register: verify_iput
-      become: yes
+      become: true
       become_user: irods
       changed_when: false
     - name: test iget
       command: "iget -f {{ inventory_hostname }}-VERSION.json /tmp/VERSION.json"
       register: verify_iget
-      become: yes
+      become: true
       become_user: irods
       changed_when: false
     - name: test iget/iput results (cmp)
       command: "cmp /var/lib/irods/VERSION.json /tmp/VERSION.json"
       register: verify_igetiput_diff
-      become: yes
+      become: true
       become_user: irods
       changed_when: false
     - name: assertions

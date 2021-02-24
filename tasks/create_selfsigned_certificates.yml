@@ -14,7 +14,7 @@
     - path: "{{ irods_ssl_ca_certificate_file }}"
       mode: 0644
 
-- name: "Generate an OpenSSL private key with the default values (4096 bits, RSA)"
+- name: "Generate an OpenSSL private key with default values (4096 bits, RSA)"
   community.crypto.openssl_privatekey:
     path: "{{ irods_ssl_certificate_key_file }}"
 

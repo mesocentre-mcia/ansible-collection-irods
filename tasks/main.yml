@@ -58,7 +58,8 @@
   when:
     - irods_cs_ssl
 
-# do this first because it's nice to have a running catalog when you want to start a resource server
+# do this first because it's nice to have a running catalog when you want to
+# start a resource server
 - name: Initialize iRODS distribution for IES (catalog server)
   include_tasks: irods-configure-ies.yml
   when:

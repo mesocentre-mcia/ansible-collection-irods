@@ -1,6 +1,8 @@
 ---
 # vars file for ansible-role-irods
 
+# yamllint disable-line rule:line-length
 ansible_role_irods_is_catalog: "{{ inventory_hostname in irods_catalog_provider_hosts or 'localhost' in irods_catalog_provider_hosts }}"
 
+# yamllint disable-line rule:line-length
 irods_package_extension: "{{ '' if irods_version is none else '-' + irods_version }}"
