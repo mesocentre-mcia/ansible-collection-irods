@@ -10,7 +10,7 @@
         # yamllint disable-line rule:line-length
         value: "{{ 'localhost' if irods_db_host in ['localhost', irods_catalog_provider_hosts[0]] else '*' }}"
     postgresql_hba_entries:
-      - type: loca
+      - type: local
         database: all
         user: postgres
         auth_method: peer
