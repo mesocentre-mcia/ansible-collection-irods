@@ -2,12 +2,9 @@
 # tasks file for ansible-role-irods
 
 # iRODS server settings
-- name: Create iRODS service account
-  user:
-    name: "irods"
-    home: "/var/lib/irods"
-    comment: "iRODS Administrator"
-    password: "!"
+
+- name: include service account
+  include_tasks: service-account.yml
 
 - name: setup iRODS CentOS Yum repository
   yum_repository:
