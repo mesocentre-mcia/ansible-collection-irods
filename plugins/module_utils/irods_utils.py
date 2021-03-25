@@ -107,6 +107,11 @@ def resc_trees(module):
         values = l.strip().split(':')
         resc = dict(zip(_RESC_FIELDS, values))
 
+        #
+        for k in _RESC_OPTIONAL_FIELDS:
+            if k in resc and resc[k].strip() == '':
+                resc[k] = ''
+
         resc['children'] = []
 
         resc['RESC_ID'] = int(resc['RESC_ID'])
@@ -128,7 +133,6 @@ def resc_trees(module):
     for r in list(rescs.values()):
 
         p_rid = r['RESC_PARENT']
-        #del r['RESC_PARENT']
 
         if p_rid is None:
             roots.add(r['RESC_ID'])
@@ -145,7 +149,7 @@ def resc_trees(module):
 
 
 def clean_hierarchy(h):
-    for k in ['RESC_ID']: # , 'RESC_PARENT'
+    for k in ['RESC_ID']:
         if k in h:
             del h[k]
 
