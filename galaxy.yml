@@ -1,0 +1,37 @@
+### REQUIRED
+namespace: mcia
+
+name: irods
+
+version: 1.0.0
+
+readme: README.md
+
+authors:
+- Pierre Gay <pierre.gay@u-bordeaux.fr>
+
+# A short summary description of the collection
+description: manage iRODS instances
+
+license:
+- GPL-2.0-or-later
+
+# A list of tags you want to associate with the collection for indexing/searching. A tag name has the same character
+# requirements as 'namespace' and 'name'
+tags: []
+
+dependencies: {}
+
+# The URL of the originating SCM repository
+repository: https://irodslab.mcia.fr/irodsadmins/ansible-collection-irods
+
+# The URL to any online docs
+documentation: https://irodslab.mcia.fr/irodsadmins/ansible-collection-irods
+
+# The URL to the homepage of the collection/project
+homepage: https://irodslab.mcia.fr/irodsadmins/ansible-collection-irods/-/blob/master
+
+# The URL to the collection issue tracker
+issues: https://irodslab.mcia.fr/irodsadmins/ansible-collection-irods/-/issues
+
+build_ignore: []
