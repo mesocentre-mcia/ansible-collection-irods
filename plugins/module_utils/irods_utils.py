@@ -38,6 +38,7 @@ _RESC_FIELDS = (
     _RESC_OPTIONAL_FIELDS
 )
 
+
 _MODRESC_ATTR_NAME = {
 #    'RESC_TYPE_NAME': 'type',
     'RESC_LOC': 'host',
@@ -107,7 +108,8 @@ def resc_trees(module):
         values = l.strip().split(':')
         resc = dict(zip(_RESC_FIELDS, values))
 
-        #
+        # fields can't be deleted or set to empty string
+        # we emulate this with blank string
         for k in _RESC_OPTIONAL_FIELDS:
             if k in resc and resc[k].strip() == '':
                 resc[k] = ''
@@ -380,6 +382,20 @@ def compare_hierarchies(module, from_list, to_list):
             op.append(mk['RESC_CONTEXT'])
 
         operations.append(iadmin(op))
+
+        # set configured fields for new resource
+        for attr in ['RESC_STATUS', 'RESC_COMMENT', 'RESC_INFO']:
+            if attr not in mk:
+                continue
+
+            op = [
+                'modresc',
+                mk['RESC_NAME'],
+                _MODRESC_ATTR_NAME[attr],
+                mk[attr]
+            ]
+
+            operations.append(iadmin(op))
 
     # add parent-child relationship to new resources
     for mk in mkresc:
