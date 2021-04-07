@@ -78,8 +78,7 @@ def main():
     if module.check_mode or not result['changed']:
         module.exit_json(**result)
 
-    # TODO: make changes
-
+    # make changes
     result['compare'] = compare_hierarchies(module, got, wanted)
 
     module.exit_json(**result)

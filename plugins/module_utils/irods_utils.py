@@ -49,6 +49,15 @@ _MODRESC_ATTR_NAME = {
     'RESC_CONTEXT': 'context',
 }
 
+
+_ZONE_FIELDS = [
+    'ZONE_NAME',
+    'ZONE_TYPE',
+    'ZONE_CONNECTION',
+    'ZONE_COMMENT',
+]
+
+
 class IrodsCommand:
 
     def __init__(self, cmd_prefix=''):
@@ -82,6 +91,59 @@ class IrodsQuest(IrodsCommand):
 
     def _command(self):
         return 'iquest'
+
+
+class IrodsEnv(IrodsCommand):
+
+    def _command(self):
+        return 'ienv'
+
+
+def ienv(module):
+    ienv = IrodsEnv()
+
+    r, o, e = module.run_command(ienv([]))
+
+    if r != 0:
+        module.fail_json(
+            msg='ienv command failed with code=%s error=\'%s\'' %
+            (r, e)
+        )
+
+    ret = {}
+
+    for l in o.strip().split('\n'):
+        k, v = l.strip().split(' - ', 1)
+        ret[k] = v
+
+    return ret
+
+
+def get_zones(module, **args):
+    iquest = IrodsQuest()
+
+    fmt = ':'.join(['%s'] * len(_ZONE_FIELDS))
+
+    cmd = 'select ' + ', '.join(_ZONE_FIELDS)
+    where_clauses = ['%s = \'%s\'' % a for a in args.items()]
+    if where_clauses:
+        cmd += ' where ' + ' and '.join(where_clauses)
+
+    r, o, e = module.run_command(iquest(['--no-page', fmt, cmd]))
+
+    if r != 0:
+        module.fail_json(
+            msg='iquest cmd=\'%s\' failed with code=%s error=\'%s\'' %
+            (cmd, r, e)
+        )
+
+    ret = []
+    for l in o.strip().split('\n'):
+        values = l.strip().split(':')
+        zone = dict(zip(_ZONE_FIELDS, values))
+        ret.append(zone)
+
+    return ret
 
 
 def resc_trees(module):
