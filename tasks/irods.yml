@@ -14,7 +14,7 @@
   template:
     src: "templates/hosts_config.json.j2"
     dest: "/etc/irods/hosts_config.json"
-    mode: 0600
+    mode: 0644
     owner: irods
     group: irods
   notify:
