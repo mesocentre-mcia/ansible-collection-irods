@@ -20,7 +20,11 @@ options:
     name:
         description: name of iRODS user
         required: true
-        type: str, list[str]
+        type: str
+    names:
+        description: list of iRODS users
+        required: true
+        type: list[str]
     state:
         description: state (present|absent)
         required: false
