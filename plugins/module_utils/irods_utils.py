@@ -3,7 +3,10 @@ from __future__ import (absolute_import, division, print_function)
 __metaclass__ = type
 
 import os.path
+import os
+
 from fnmatch import fnmatch
+from tempfile import mkstemp
 
 
 # iRODS resource hierarchy description fields
@@ -103,6 +106,12 @@ class IrodsInit(IrodsCommand):
 
     def _command(self):
         return 'iinit'
+
+
+class IrodsLs(IrodsCommand):
+
+    def _command(self):
+        return 'ils'
 
 
 def ienv(module):
@@ -495,3 +504,78 @@ def compare_hierarchies(module, from_list, to_list):
         _run(op)
 
     return [' '.join(op) for op in operations]
+
+
+def irods_env(host, port, zone):
+   env = {}
+
+   if host is not None:
+       env['IRODS_HOST'] = host
+
+   if port is not None:
+       env['IRODS_PORT'] = str(port)
+
+   if zone is not None:
+       env['IRODS_ZONE_NAME'] = zone
+
+   return env
+
+
+CAT_INVALID_AUTHENTICATION = 7
+
+
+def irods_check_client(module, host, port, zone, user, auth_file):
+    env = dict(
+        IRODS_USER_NAME=user,
+        IRODS_AUTHENTICATION_FILE=auth_file,
+    )
+
+    if not os.path.isfile(auth_file):
+        return False
+
+    env.update(irods_env(host, port, zone))
+
+    ils = IrodsLs()
+
+    r, o, e = module.run_command(ils(['/']), environ_update=env)
+
+    if r == CAT_INVALID_AUTHENTICATION:
+        return False
+
+    if r != 0:
+        module.fail_json(msg='ils failed with code=%s error=\'%s\'' % (r, e))
+
+    return True
+
+
+def irods_init_client(module, host, port, zone, user, password, auth_file):
+    env = dict(
+        IRODS_USER_NAME=user,
+        IRODS_AUTHENTICATION_FILE=auth_file,
+    )
+
+    env.update(irods_env(host, port, zone))
+
+    iinit = IrodsInit()
+
+    r, o, e = module.run_command(iinit([password]), environ_update=env)
+
+    if r == CAT_INVALID_AUTHENTICATION:
+        return False
+
+    if r != 0:
+        module.fail_json(msg='iinit failed with code=%s error=\'%s\'' % (r, e))
+
+    return True
+
+
+def check_irods_password(module, host, port, zone, user, password):
+    fd, pwdfile = mkstemp()
+    try:
+        os.close(fd)
+
+        return irods_init_client(module, host, port, zone, user, password,
+                                 pwdfile)
+
+    finally:
+        os.unlink(pwdfile)

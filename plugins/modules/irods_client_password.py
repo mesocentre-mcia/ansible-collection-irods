@@ -3,9 +3,9 @@
 
 DOCUMENTATION = r'''
 ---
-module: irods_user_password
+module: irods_client_password
 
-short_description: sets iRODS password for a user
+short_description: sets iRODS password file for a user
 
 version_added: "1.0.0"
 
@@ -38,32 +38,21 @@ author:
 '''
 
 EXAMPLES = r'''
-mcia.irods.irods_user_password:
+mcia.irods.irods_client_password:
   zone: demoZone
   user: demoUser
   password: SecretPassword
 '''
 
+import os
+from tempfile import mkstemp
+
 from ansible.module_utils.basic import AnsibleModule
 
 from ansible_collections.mcia.irods.plugins.module_utils.irods_utils import (
-    IrodsAdmin,
-    check_irods_password,
+    irods_init_client,
+    irods_check_client,
 )
-
-
-def change_irods_password(module, host, port, zone, user, password):
-    env = irods_env(host, port, zone)
-
-    iadmin = IrodsAdmin()
-
-    r, o, e = module.run_command(iadmin(['moduser', user, 'password', password]))
-
-    if r != 0:
-        module.fail_json(
-            msg='iadmin failed with code=%s error=\'%s\'' %
-                (r, e)
-        )
 
 
 def main():
@@ -73,6 +62,7 @@ def main():
         zone=dict(type='str', required=False),
         user=dict(type='str'),
         password=dict(type='str', no_log=True),
+        password_file=dict(type='str', no_log=False),
     )
 
     module = AnsibleModule(
@@ -90,8 +80,9 @@ def main():
     zone = module.params['zone']
     user = module.params['user']
     password = module.params['password']
+    password_file = module.params['password_file']
 
-    ok = check_irods_password(module, host, port, zone, user, password)
+    ok = irods_check_client(module, host, port, zone, user, password_file)
 
     if not ok:
         result['changed'] = True
@@ -99,7 +90,7 @@ def main():
     if module.check_mode or not result['changed']:
         module.exit_json(**result)
 
-    change_irods_password(module, host, port, zone, user, password)
+    irods_init_client(module, host, port, zone, user, password, password_file)
 
     module.exit_json(**result)
 
