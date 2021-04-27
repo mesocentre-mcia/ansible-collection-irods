@@ -99,6 +99,12 @@ class IrodsEnv(IrodsCommand):
         return 'ienv'
 
 
+class IrodsInit(IrodsCommand):
+
+    def _command(self):
+        return 'iinit'
+
+
 def ienv(module):
     ienv = IrodsEnv()
 
