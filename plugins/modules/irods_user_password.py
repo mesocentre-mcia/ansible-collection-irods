@@ -49,6 +49,7 @@ from ansible.module_utils.basic import AnsibleModule
 from ansible_collections.mcia.irods.plugins.module_utils.irods_utils import (
     IrodsAdmin,
     check_irods_password,
+    irods_env,
 )
 
 
