@@ -4,10 +4,10 @@
     {
       "address_type" : "{{ 'local' if host == inventory_hostname else 'remote' }}",
       "addresses" : [
-        {"address" : "{{ hostvars[host]['ansible_default_ipv4']['address'] }}"},
-        {"address" : "{{ host }}"}
+        {"address" : "{{ host }}"},
+        {"address" : "{{ hostvars[host]['ansible_default_ipv4']['address'] }}"}
       ]
-    } 
+    }
   {% endfor %}
   ]
 }
