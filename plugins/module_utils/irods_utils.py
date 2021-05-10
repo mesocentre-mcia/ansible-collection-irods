@@ -161,6 +161,33 @@ def get_zones(module, **args):
     return ret
 
 
+def rescs_id_name(module):
+    iquest = IrodsQuest()
+    fields = ['RESC_ID', 'RESC_NAME']
+
+    fmt = ':'.join(['%s'] * len(fields))
+
+    cmd = 'select ' + ', '.join(fields)
+    if (module.params['zone'] is not None):
+        cmd += ' where RESC_ZONE_NAME = \'%s\'' % module.params['zone']
+
+    r, o, e = module.run_command(iquest(['--no-page', fmt, cmd]))
+
+    if r != 0:
+        module.fail_json(
+            msg='iquest cmd=\'%s\' failed with code=%s error=\'%s\'' %
+            (cmd, r, e)
+        )
+
+    ret = {}
+
+    for l in o.strip().split('\n'):
+        id, name = l.strip().split(':')
+
+        ret[int(id)] = name
+
+    return ret
+
 def resc_trees(module):
     iquest = IrodsQuest()
 
