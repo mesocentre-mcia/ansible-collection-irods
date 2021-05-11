@@ -12,13 +12,19 @@ version_added: "1.0.0"
 description: |
     Has to be used with 'become' and 'become_user'
 
+    Allows to define per zone and resource user quotas. Identical quota can be
+    set for group members by specifying `'%group_name': limit`.
+
+    user limit takes precedence upon group limit. Precedence between group
+    limits is undefined.
+
 options:
     zone:
         description: name of iRODS zone (defaults to local zone)
         required: false
         type: str
     limits:
-        description: dictionary of limit per user
+        description: dictionary of limit per user/group
         required: true
         type: dict(int)
     resource:
@@ -36,6 +42,13 @@ mcia.irods.irods_user:
   resource: demoResc
   limits:
     demoUser: 10000
+
+mcia.irods.irods_user:
+  zone: demoZone
+  resource: demoResc
+  limits:
+    '%demoGroup': 20000
+    demoUser: 30000
 '''
 
 from ansible.module_utils.basic import AnsibleModule
@@ -45,6 +58,7 @@ from ansible_collections.mcia.irods.plugins.module_utils.irods_utils import (
     IrodsAdmin,
     get_zones,
     rescs_id_name,
+    get_user_groups,
 )
 
 _QUOTA_FIELDS = [
@@ -118,14 +132,22 @@ def params_to_quotas(params):
             skel[v] = params[k]
 
     quotas = {}
+    group_quotas = {}
 
     for user, limit in params['limits'].items():
+        qdict = quotas
+        if user.startswith('%'):
+            user = user[1:]
+            qdict = group_quotas
+
         u = skel.copy()
+
         u['QUOTA_USER_NAME'] = user
         u['QUOTA_LIMIT'] = limit
-        quotas[user] = u
 
-    return quotas
+        qdict[user] = u
+
+    return quotas, group_quotas
 
 def qprint(q):
     return ' '.join([
@@ -138,7 +160,7 @@ def qprint(q):
 
 def quotas_to_string(quotas):
 
-    return '\n'.join([qprint(v) for v in quotas.values()]) + '\n'
+    return '\n'.join([qprint(quotas[k]) for k in sorted(quotas.keys())]) + '\n'
 
 def set_user_quota(module, user, zone, resource, limit):
     iadmin = IrodsAdmin()
@@ -179,7 +201,16 @@ def main():
 
 
     got = get_quotas(module)
-    wanted = params_to_quotas(module.params)
+
+    wanted, group_quotas = params_to_quotas(module.params)
+
+    user_groups = get_user_groups(module, module.params['zone'])
+
+    for g, q in group_quotas.items():
+        for u in user_groups[g]:
+            if u not in wanted:
+                wanted[u] = got[u].copy()
+                wanted[u]['QUOTA_LIMIT'] = q['QUOTA_LIMIT']
 
     # filter got users with those specified in params
     got = {k: v.copy() for k, v in got.items() if k in wanted}

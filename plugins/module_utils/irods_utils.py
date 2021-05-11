@@ -60,6 +60,10 @@ _ZONE_FIELDS = [
     'ZONE_COMMENT',
 ]
 
+_USER_GROUP_FIELDS = [
+    'USER_NAME',
+    'USER_GROUP_NAME',
+]
 
 class IrodsCommand:
 
@@ -606,3 +610,42 @@ def check_irods_password(module, host, port, zone, user, password):
 
     finally:
         os.unlink(pwdfile)
+
+
+def get_user_groups(module, zone=None, group=None):
+    iquest = IrodsQuest()
+
+    fmt = ':'.join(['%s'] * len(_USER_GROUP_FIELDS))
+
+    cmd = 'select ' + ', '.join(_USER_GROUP_FIELDS)
+
+    where_clauses = []
+
+    if zone is not None:
+        where_clauses.append('USER_ZONE = \'{}\''.format(zone))
+
+    if group is not None:
+        where_clauses.append('USER_GROUP_NAME = \'{}\''.format(group))
+
+    if where_clauses:
+        cmd += ' where ' + ' and '.join(where_clauses)
+
+    r, o, e = module.run_command(iquest(['--no-page', fmt, cmd]))
+
+    if r != 0:
+        module.fail_json(
+            msg='iquest cmd=\'%s\' failed with code=%s error=\'%s\'' %
+            (cmd, r, e)
+        )
+
+    ret = {}
+    for l in o.strip().split('\n'):
+        u, g = l.split(':', 1)
+
+        if g not in ret:
+            ret[g] = []
+
+        if g != u: # irods user/group are quite the same
+            ret[g].append(u)
+
+    return ret
