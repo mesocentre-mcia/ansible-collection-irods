@@ -17,28 +17,28 @@
     # database stuff
     - include_role:
         # catalog needs to know how to connect to irods_db_host
-        name: ansible-role-irods
+        name: irods
         tasks_from: "fill-etc-hosts"
 
     - name: "Configure host as a database server"
       include_role:
-        name: ansible-role-irods
+        name: irods
         tasks_from: "database-role-PostgreSQL"
       when: inventory_hostname == irods_db_host
 
     - name: "create iRODS database on server"
       include_role:
-        name: ansible-role-irods
+        name: irods
         tasks_from: "database-configure-PostgreSQL"
       when: inventory_hostname == irods_db_host
 
     # prepare hosts for SSL setup with self-signed certificates
     - name: "Include ansible-role-irods"
       include_role:
-        name: "ansible-role-irods"
+        name: irods
         tasks_from: "create_selfsigned_certificates.yml"
 
     # run irods role
-    - name: "Include ansible-role-irods"
+    - name: "Include irods ansible role"
       include_role:
-        name: "ansible-role-irods"
+        name: irods
