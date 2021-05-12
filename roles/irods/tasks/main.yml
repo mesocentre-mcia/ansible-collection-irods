@@ -1,0 +1,73 @@
+---
+# tasks file for role irods
+
+# iRODS server settings
+
+- name: include service account
+  include_tasks: service-account.yml
+
+- name: setup iRODS CentOS Yum repository
+  yum_repository:
+    name: "renci-irods"
+    description: "RENCI iRODS Repository"
+    baseurl: "https://packages.irods.org/yum/pool/centos$releasever/$basearch"
+    enabled: true
+    gpgkey: "https://packages.irods.org/irods-signing-key.asc"
+    gpgcheck: true
+
+- name: Install iRODS server packages
+  package:
+    pkg:
+      - "irods-server{{ irods_package_extension }}"
+      - "irods-database-plugin-postgres{{ irods_package_extension }}"
+
+- name: iRODS various directories ownership
+  file:
+    path: "{{ item }}"
+    state: directory
+    mode: 0755
+    owner: irods
+    group: irods
+  loop:
+    - "/etc/irods"
+    - "/var/lib/irods"
+    - "/var/lib/irods/log"
+
+- name: iRODS server setup file
+  template:
+    src: "templates/setup_irods.json.j2"
+    dest: "/etc/irods/setup_irods.json"
+    mode: 0600
+    owner: irods
+    group: irods
+  when: ansible_role_irods_is_catalog
+
+- name: Check SSL certificate availability
+  file:
+    path: "{{ item.path }}"
+    mode: "{{ item.mode }}"
+    owner: irods
+    group: irods
+  loop:
+    - {"path": "{{ irods_ssl_certificate_chain_file }}", "mode": "0644"}
+    - {"path": "{{ irods_ssl_certificate_key_file }}", "mode": "0600"}
+    - {"path": "{{ irods_ssl_ca_certificate_file }}", "mode": "0644"}
+  when:
+    - irods_cs_ssl
+
+# do this first because it's nice to have a running catalog when you want to
+# start a resource server
+- name: Initialize iRODS distribution for IES (catalog server)
+  include_tasks: irods-configure-ies.yml
+  when:
+    - ansible_role_irods_is_catalog
+
+# trigger handlers for catalog
+- name: flush handlers
+  meta: flush_handlers
+
+# then configure other servers
+- name: Initialize iRODS distribution for non-IES (resource only server)
+  include_tasks: irods-configure-nonies.yml
+  when:
+    - not ansible_role_irods_is_catalog

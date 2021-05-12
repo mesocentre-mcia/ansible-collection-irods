@@ -1,0 +1,38 @@
+---
+# PostgreSQL database server configuration
+
+- name: Setup Catalog Database
+  include_role:
+    name: geerlingguy.postgresql
+  vars:
+    postgresql_global_config_options:
+      - option: listen_addresses
+        # yamllint disable-line rule:line-length
+        value: "{{ 'localhost' if irods_db_host in ['localhost', irods_catalog_provider_hosts[0]] else '*' }}"
+    postgresql_hba_entries:
+      - type: local
+        database: all
+        user: postgres
+        auth_method: peer
+      - type: local
+        database: all
+        user: all
+        auth_method: peer
+      - type: host
+        database: all
+        user: all
+        address: '127.0.0.1/32'
+        auth_method: md5
+      - type: host
+        database: all
+        user: all
+        address: '::1/128'
+        auth_method: md5
+      - type: host
+        database: all
+        user: all
+        address: '{{ irods_catalog_provider_hosts[0] }}'
+        auth_method: md5
+
+    postgres_users_no_log: true
+    become: true

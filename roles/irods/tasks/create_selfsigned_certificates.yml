@@ -1,0 +1,70 @@
+---
+# prepare hosts for SSL setup with self-signed certificates
+
+- name: include service account
+  include_tasks: service-account.yml
+
+- name: create certificates directory
+  file:
+    path: "{{ item.path | dirname }}"
+    state: directory
+    mode: 0755
+  loop:
+    - path: "{{ irods_ssl_certificate_key_file }}"
+    - path: "{{ irods_ssl_certificate_chain_file }}"
+    - path: "{{ irods_ssl_ca_certificate_file }}"
+
+- name: "Generate an OpenSSL private key with default values (4096 bits, RSA)"
+  community.crypto.openssl_privatekey:
+    path: "{{ irods_ssl_certificate_key_file }}"
+    owner: irods
+    group: irods
+
+- name: Generate an OpenSSL Certificate Signing Request
+  community.crypto.openssl_csr:
+    path: "/tmp/server.csr"
+    privatekey_path: "{{ irods_ssl_certificate_key_file }}"
+    common_name: "{{ inventory_hostname }}"
+    owner: irods
+    group: irods
+
+- name: Generate a Self Signed OpenSSL certificate
+  community.crypto.x509_certificate:
+    path: "{{ irods_ssl_certificate_chain_file }}"
+    privatekey_path: "{{ irods_ssl_certificate_key_file }}"
+    csr_path: "/tmp/server.csr"
+    provider: selfsigned
+    owner: irods
+    group: irods
+
+- name: Wait for {{ irods_ssl_certificate_chain_file }} before continuing
+  wait_for:
+    path: "{{ irods_ssl_certificate_chain_file }}"
+
+- name: localhost cleanup
+  file:
+    path: "/tmp/ansible-role-irods/certs/"
+    state: absent
+
+- name: Get hosts certificates
+  fetch:
+    src: "{{ irods_ssl_certificate_chain_file }}"
+    dest: "/tmp/ansible-role-irods/certs/"
+
+- name: Distribute hosts certificates
+  copy:
+    src: "/tmp/ansible-role-irods/certs/{{ item }}/etc/irods/certs/server.crt"
+    dest: "/tmp/{{ item }}.crt"
+    owner: irods
+    group: irods
+    mode: 0644
+  loop: "{{ play_hosts }}"
+
+- name: Gather hosts certificates into a bundle ca.crt
+  assemble:
+    src: "/tmp"
+    regexp: "^.*\\.crt$"
+    dest: "{{ irods_ssl_ca_certificate_file }}"
+    owner: irods
+    group: irods
+    mode: 0644

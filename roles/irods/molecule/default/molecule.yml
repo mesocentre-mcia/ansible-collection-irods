@@ -1,0 +1,26 @@
+---
+
+dependency:
+  name: galaxy
+  env:
+    ANSIBLE_ROLES_PATH: ~/.ansible/roles/
+driver:
+  name: docker
+lint: |
+  yamllint .
+  # exclude SSL task until https://github.com/ansible/ansible-lint/pull/642 is
+  # resolved. (ansible-lint 4.3?)
+  ansible-lint --exclude=tasks/create_selfsigned_certificates.yml
+platforms:
+  - name: instance
+    image: geerlingguy/docker-${MOLECULE_DISTRO:-centos7}-ansible:latest
+    command: ""
+    volumes:
+      - "/sys/fs/cgroup:/sys/fs/cgroup:ro"
+    privileged: true
+    pre_build_image: true
+
+provisioner:
+  name: ansible
+verifier:
+  name: ansible

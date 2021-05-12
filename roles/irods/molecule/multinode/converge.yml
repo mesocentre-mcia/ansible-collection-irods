@@ -1,0 +1,44 @@
+---
+
+- name: Converge
+  hosts: all
+  vars:
+    irods_catalog_provider_hosts: ['icat']
+    irods_hosts: ['icat', 'irods0']
+    irods_db_host: 'irods0'
+    irods_admin_password: "VERY_SECRET_ADMIN_PASSWORD"
+    irods_database_user_password_salt: "VERY_SECRET_SALT"
+    irods_negotiation_key: "09876543210987654321098765432109"
+    irods_db_password: "VERY_SECRET_PASSWORD"
+    irods_server_control_plane_key: "12345678901234567890123456789012"
+    irods_zone_key: "VERY_SECRET_KEY"
+    irods_cs_ssl: true
+  tasks:
+    # database stuff
+    - include_role:
+        # catalog needs to know how to connect to irods_db_host
+        name: irods
+        tasks_from: "fill-etc-hosts"
+
+    - name: "Configure host as a database server"
+      include_role:
+        name: irods
+        tasks_from: "database-role-PostgreSQL"
+      when: inventory_hostname == irods_db_host
+
+    - name: "create iRODS database on server"
+      include_role:
+        name: irods
+        tasks_from: "database-configure-PostgreSQL"
+      when: inventory_hostname == irods_db_host
+
+    # prepare hosts for SSL setup with self-signed certificates
+    - name: "Include ansible-role-irods"
+      include_role:
+        name: irods
+        tasks_from: "create_selfsigned_certificates.yml"
+
+    # run irods role
+    - name: "Include irods ansible role"
+      include_role:
+        name: irods

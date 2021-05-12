@@ -1,0 +1,26 @@
+---
+image: quay.io/ansible/molecule:3.0.8
+
+stages:
+  - test
+
+variables:
+  PIP_CACHE_DIR: "$CI_PROJECT_DIR/.pip"
+  GIT_STRATEGY: clone
+
+cache:
+  paths:
+    - .pip/
+
+before_script:
+  - python3 -V
+  - pip3 install ansible molecule docker
+  - ansible --version
+  - molecule --version
+  - docker --version
+
+role-irods:
+  stage: test
+  script:
+    - cd roles/irods
+    - molecule test --all
