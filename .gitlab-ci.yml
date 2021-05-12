@@ -19,7 +19,8 @@ before_script:
   - molecule --version
   - docker --version
 
-molecule:
+role-irods:
   stage: test
   script:
+    - cd roles/irods
     - molecule test --all
