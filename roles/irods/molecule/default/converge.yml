@@ -15,12 +15,12 @@
       include_vars: "vars.yml"
     - name: "Configure host as a database server"
       include_role:
-        name: ansible-role-irods
+        name: irods
         tasks_from: "database-role-PostgreSQL"
     - name: "create iRODS database on server"
       include_role:
-        name: ansible-role-irods
+        name: irods
         tasks_from: "database-configure-PostgreSQL"
-    - name: "Include ansible-role-irods"
+    - name: "Include irods ansible role"
       include_role:
-        name: "ansible-role-irods"
+        name: irods

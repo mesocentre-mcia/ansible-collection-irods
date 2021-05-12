@@ -1,5 +1,5 @@
 ---
-# tasks file for ansible-role-irods
+# tasks file for role irods
 
 # iRODS server settings
 
