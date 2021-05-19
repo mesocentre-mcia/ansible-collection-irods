@@ -7,41 +7,49 @@ module: irods_client_password
 
 short_description: sets iRODS password file for a user
 
-version_added: "1.0.0"
-
-description: |
-    Has to be used with 'become' and 'become_user' to an irods admin account
+description:
+  - "Configures icommands password for a user by running iinit."
+  - "Has to be used with `become` and `become_user` to the UNIX user's icommands
+     are to be configured."
 
 options:
-    hosts:
-        description: IES FQDN (defaults to user environment value if defined)
-        required: false
-        type: str
-    port:
-        description: iRODS port (defaults to user environment value if defined)
-        required: false
-        type: str
-    zone:
-        description: name of iRODS zone (defaults to user environment value if defined)
-        required: false
-        type: str
-    user:
-        description: name of iRODS user
-        required: true
-        type: str
-    password:
-        description: iRODS password
-        required: true
-        type: str
+  host:
+    description: "IES FQDN (defaults to user environment value if defined)"
+    required: false
+    type: str
+  port:
+    description:
+      - "iRODS port (defaults to user environment value if defined)"
+    required: false
+    type: str
+  zone:
+    description:
+      - "name of iRODS zone (defaults to user environment value if defined)"
+    required: false
+    type: str
+  user:
+    description:
+      - "name of iRODS user"
+    required: true
+    type: str
+  password:
+    description:
+      - "iRODS password"
+    required: true
+    type: str
+
 author:
-    - Pierre Gay
+    - "Pierre Gay (@pigay)"
 '''
 
 EXAMPLES = r'''
-mcia.irods.irods_client_password:
-  zone: demoZone
-  user: demoUser
-  password: SecretPassword
+- name: set user password
+  mcia.irods.irods_client_password:
+    zone: demoZone
+    user: demoUser
+    password: SecretPassword
+  become: yes
+  become_user: demoUnixUser
 '''
 
 import os

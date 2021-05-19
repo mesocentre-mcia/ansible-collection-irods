@@ -1,38 +1,143 @@
-Role Name
+iRODS
 =========
 
-A brief description of the role goes here.
+Installs and configures iRODS service on RHEL/CentOS servers. Catalog database
+is installed with PostgreSQL backend.
 
 Requirements
 ------------
 
-Any pre-requisites that may not be covered by Ansible itself or the role should be mentioned here. For instance, if the role uses the EC2 module, it may be a good idea to mention in this section that the boto package is required.
+This role requires:
+* `geerlingguy.postgresql` role
+* optionally `community.crypto` collection if selfsigned certificates are to be
+  produced
 
 Role Variables
 --------------
 
-A description of the settable variables for this role should go here, including any variables that are in defaults/main.yml, vars/main.yml, and any variables that can/should be set via parameters to the role. Any variables that are read from other roles and/or the global scope (ie. hostvars, group vars, etc.) should be mentioned here as well.
+Available variables are listed below, along with default values (see `defaults/main.yml`):
 
-Dependencies
-------------
+    irods_zone_name: "demoZone"
 
-A list of other roles hosted on Galaxy should go here, plus any details in regards to parameters that may need to be set for other roles, or variables that are used from other roles.
+Name of the server's zone.
+
+    irods_catalog_provider_hosts: ["localhost"]
+
+List of catalog provider servers.
+
+    irods_hosts: []
+
+List of other hosts in the configured zone (resource servers).
+
+    irods_default_resource_name: "demoResc"
+
+Name of default resource (used in `server_config.json` and service account `irods_environment.json`).
+
+    irods_version: null
+
+iRODS version to install (`null` is latest version)
+
+    irods_cs_ssl: false
+
+Client/server SSL negotiation.
+
+    irods_db_host: "localhost"
+    irods_db_name: "ICAT"
+    irods_db_odbc_driver: "PostgreSQL"
+    irods_db_port: 5432
+    irods_db_username: "irods"
+
+PostgreSQL configuration options.
+
+    irods_zone_port: 1247
+    irods_server_control_plane_port: 1248
+    irods_xmsg_port: 1279
+
+    irods_server_port_range_start: 20000
+    irods_server_port_range_end: 20199
+
+iRODS network ports.
+
+    irods_zone_user: "rods"
+
+iRODS zone admin user name.
+
+    irods_ssl_default_directory: "/etc/irods/certs"
+    irods_ssl_certificate_chain_file: "{{ irods_ssl_default_directory }}/server.crt"
+    irods_ssl_certificate_key_file: "{{ irods_ssl_default_directory }}/server.key"
+    irods_ssl_verify_server: "hostname"
+    irods_ssl_ca_certificate_file: "{{ irods_ssl_default_directory }}/ca.crt"
+
+SSL configuration options. Certificates are to be provided separately or created
+with selfsigned provided task (see Playbook examples below).
+
+Some mandatory variables don't have a default value. They are your zone's secret
+values (passwords, secret keys, etc.). **You must define these**, preferably
+with random/hard to guess values:
+
+* `irods_admin_password`
+* `irods_database_user_password_salt`
+* `irods_zone_key`
+* `irods_db_password`
+* `irods_negotiation_key`: has to be a 32 bytes long string
+* `irods_server_control_plane_key`: has to be a 32 bytes long string
 
 Example Playbook
 ----------------
 
-Including an example of how to use your role (for instance, with variables passed in as parameters) is always nice for users too:
+Here is a two hosts example playbook:
+* host `icat` is the catalog provider
+* host `irods0` is at the same time the database server and a resource server
+* client/server SSL negotiation is requested
+* server self-signed certificates are installed
 
-    - hosts: servers
-      roles:
-         - { role: username.rolename, x: 42 }
+    - name: Converge
+      hosts: all
+      vars:
+        irods_catalog_provider_hosts: ['icat']
+        irods_hosts: ['icat', 'irods0']
+        irods_db_host: 'irods0'
+        irods_admin_password: "VERY_SECRET_ADMIN_PASSWORD"
+        irods_database_user_password_salt: "VERY_SECRET_SALT"
+        irods_negotiation_key: "09876543210987654321098765432109"
+        irods_db_password: "VERY_SECRET_PASSWORD"
+        irods_server_control_plane_key: "12345678901234567890123456789012"
+        irods_zone_key: "VERY_SECRET_KEY"
+        irods_cs_ssl: true
+      tasks:
+        # database stuff
+        - include_role:
+            # catalog needs to know how to connect to irods_db_host
+            name: irods
+            tasks_from: "fill-etc-hosts"
+
+        - name: "Configure host as a database server"
+          include_role:
+            name: irods
+            tasks_from: "database-role-PostgreSQL"
+          when: inventory_hostname == irods_db_host
+
+        - name: "create iRODS database on server"
+          include_role:
+            name: irods
+            tasks_from: "database-configure-PostgreSQL"
+          when: inventory_hostname == irods_db_host
+
+        # prepare hosts for SSL setup with self-signed certificates
+        - name: "Include ansible-role-irods"
+          include_role:
+            name: irods
+            tasks_from: "create_selfsigned_certificates.yml"
+
+        # run irods role
+        - name: "Include irods ansible role"
+          include_role:
+            name: irods
+
 
 License
 -------
 
-BSD
+GNU General Public License v3.0 or later.
 
-Author Information
-------------------
-
-An optional section for the role authors to include contact information, or a website (HTML is not allowed).
+See [COPYING](https://www.gnu.org/licenses/gpl-3.0.txt) to see the full text.

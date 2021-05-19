@@ -7,48 +7,49 @@ module: irods_user_quota
 
 short_description: configure iRODS users quotas
 
-version_added: "1.0.0"
-
-description: |
-    Has to be used with 'become' and 'become_user'
-
-    Allows to define per zone and resource user quotas. Identical quota can be
-    set for group members by specifying `'%group_name': limit`.
-
-    user limit takes precedence upon group limit. Precedence between group
-    limits is undefined.
+description:
+  - "Allows to define per zone and per resource user quotas. Identical quota can
+     be set for group members by specifying `'%group_name': limit`."
+  - "User limit takes precedence upon group limit. Precedence between group
+     limits is undefined."
+  - "To use this module, `become_user` must be set to a unix user configured to
+     have access to a rodsadmin iRODS user."
 
 options:
-    zone:
-        description: name of iRODS zone (defaults to local zone)
-        required: false
-        type: str
-    limits:
-        description: dictionary of limit per user/group
-        required: true
-        type: dict(int)
-    resource:
-        description: name of resource (defaults to 'total')
-        required: false
-        type: str
+  zone:
+    description: name of iRODS zone
+    required: false
+    type: str
+    default: <local zone>
+  limits:
+    description: dictionary of limit per user/group
+    required: true
+    type: dict(int)
+  resource:
+    description: name of resource
+    required: false
+    type: str
+    default: "total"
 
 author:
-    - Pierre Gay
+  - "Pierre Gay (@pigay)"
 '''
 
 EXAMPLES = r'''
-mcia.irods.irods_user:
-  zone: demoZone
-  resource: demoResc
-  limits:
-    demoUser: 10000
+- name: Set quota for demoUser
+  mcia.irods.irods_user:
+    zone: demoZone
+    resource: demoResc
+    limits:
+      demoUser: 10000
 
-mcia.irods.irods_user:
-  zone: demoZone
-  resource: demoResc
-  limits:
-    '%demoGroup': 20000
-    demoUser: 30000
+- name: Set identical quota for all users in group demoGroup except demoUser
+  mcia.irods.irods_user:
+    zone: demoZone
+    resource: demoResc
+    limits:
+      '%demoGroup': 20000
+      demoUser: 30000
 '''
 
 from ansible.module_utils.basic import AnsibleModule

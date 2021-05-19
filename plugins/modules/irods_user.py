@@ -7,50 +7,63 @@ module: irods_user
 
 short_description: configure iRODS users
 
-version_added: "1.0.0"
-
-description: |
-    Has to be used with 'become' and 'become_user'
+description:
+  - "Configures iRODS users provided in the `name` or `names` option according
+     to `state`"
+  - "To use this module, `become_user` must be set to a unix user configured to
+     have access to a rodsadmin iRODS user."
 
 options:
-    zone:
-        description: name of iRODS zone (defaults to local zone)
-        required: false
-        type: str
-    name:
-        description: name of iRODS user
-        required: true
-        type: str
-    names:
-        description: list of iRODS users
-        required: true
-        type: list[str]
-    state:
-        description: state (present|absent)
-        required: false
-        type: str
-    type:
-        description: user type (rodsadmin, rodsgroup, rodsuser)
-        required: false
-        default: rodsuser
-        type: str
-    info:
-        description: user info
-        required: false
-        type: str
-    comment:
-        description: user comment
-        required: false
-        type: str
+  zone:
+    description: name of iRODS zone
+    required: false
+    type: str
+    default: <local zone>
+  name:
+    description: name of iRODS user
+    required: true
+    type: str
+  names:
+    description: list of iRODS user names
+    required: true
+    type: list[str]
+  state:
+    description: state
+    required: false
+    type: str
+    choices: [present, absent]
+  type:
+    description: user type
+    required: false
+    default: rodsuser
+    type: str
+    choices: [rodsadmin, rodsgroup, rodsuser]
+  info:
+    description:
+      - "If `state: present', enforces `user_info` for the selected users to
+         the provided value"
+    required: false
+    type: str
+  comment:
+    description:
+      - "If `state: present', enforces `r_comment` for the selected users to
+         the provided value"
+    required: false
+    type: str
+
 author:
-    - Pierre Gay
+    - "Pierre Gay (@pigay)"
 '''
 
 EXAMPLES = r'''
-mcia.irods.irods_user:
-  zone: demoZone
-  name: demoUser
-  state: present
+- name: create some iRODS users
+  mcia.irods.irods_user:
+    names:
+      - demoUser1
+      - demoUser2
+    type: rodsuser
+    state: present
+    info: "created with Ansible"
 '''
 
 from ansible.module_utils.basic import AnsibleModule
