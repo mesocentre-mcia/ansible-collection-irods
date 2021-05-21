@@ -66,9 +66,7 @@ See [Ansible's dev guide](https://docs.ansible.com/ansible/devel/dev_guide/devel
 
 ## Licensing
 
-GNU General Public License v3.0 or later.
-
-See [COPYING](https://www.gnu.org/licenses/gpl-3.0.txt) to see the full text.
+[Creative Commins Attribution 4.0](https://creativecommons.org/licenses/by/4.0/)
 
 ## Authors
 

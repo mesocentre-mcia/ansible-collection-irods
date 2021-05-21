@@ -9,13 +9,13 @@ version: 1.0.0
 readme: README.md
 
 authors:
-  - Pierre Gay <pierre.gay@u-bordeaux.fr>
+  - "Pierre Gay (@pigay)"
 
 # A short summary description of the collection
 description: manage iRODS instances
 
 license:
-  - GPL-2.0-or-later
+  - CC-BY
 
 # A list of tags you want to associate with the collection for
 # indexing/searching. A tag name has the same character requirements as

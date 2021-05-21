@@ -133,11 +133,3 @@ Here is a two hosts example playbook:
         - name: "Include irods ansible role"
           include_role:
             name: irods
-
-
-License
--------
-
-GNU General Public License v3.0 or later.
-
-See [COPYING](https://www.gnu.org/licenses/gpl-3.0.txt) to see the full text.
