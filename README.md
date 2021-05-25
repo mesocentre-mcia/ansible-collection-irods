@@ -66,7 +66,7 @@ See [Ansible's dev guide](https://docs.ansible.com/ansible/devel/dev_guide/devel
 
 ## Licensing
 
-[Creative Commins Attribution 4.0](https://creativecommons.org/licenses/by/4.0/)
+[Creative Commons Attribution 4.0](https://creativecommons.org/licenses/by/4.0/)
 
 ## Authors
 

@@ -25,15 +25,15 @@ tags: []
 dependencies: {}
 
 # The URL of the originating SCM repository
-repository: https://irodslab.mcia.fr/irodsadmins/ansible-collection-irods
+repository: https://github.com/mesocentre-mcia/ansible-collection-irods
 
 # The URL to any online docs
-documentation: https://irodslab.mcia.fr/irodsadmins/ansible-collection-irods
+documentation: https://github.com/mesocentre-mcia/ansible-collection-irods
 
 # The URL to the homepage of the collection/project
-homepage: https://irodslab.mcia.fr/irodsadmins/ansible-collection-irods
+homepage: https://github.com/mesocentre-mcia/ansible-collection-irods
 
 # The URL to the collection issue tracker
-issues: https://irodslab.mcia.fr/irodsadmins/ansible-collection-irods/-/issues
+issues: https://github.com/mesocentre-mcia/ansible-collection-irods/issues
 
 build_ignore: []
