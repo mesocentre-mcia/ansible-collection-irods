@@ -15,7 +15,8 @@
     irods_cs_ssl: true
   tasks:
     # database stuff
-    - include_role:
+    - name: "Include tasks fill-etc-hosts (irods_db_host)"
+      include_role:
         # catalog needs to know how to connect to irods_db_host
         name: irods
         tasks_from: "fill-etc-hosts"
