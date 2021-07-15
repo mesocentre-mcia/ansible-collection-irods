@@ -5,6 +5,9 @@ galaxy_info:
   description: maintainer
   company: MCIA
 
+  role_name: irods
+  namespace: mcia
+
   license: CC-BY
 
   min_ansible_version: 2.9
