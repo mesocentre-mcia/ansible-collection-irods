@@ -22,7 +22,13 @@ irods_cs_ssl: false
 
 irods_db_host: "localhost"
 irods_db_name: "ICAT"
-irods_db_odbc_driver: "PostgreSQL"
+# ODBC driver for postgres:
+# CentOS: "PostgreSQL"
+# Ubuntu: "PostgreSQL ANSI" or "PostgreSQL Unicode"
+irods_db_odbc_driver: "{{ (ansible_distribution == 'Ubuntu')|ternary(
+                          'PostgreSQL ANSI',
+                          'PostgreSQL')
+                       }}"
 irods_db_port: 5432
 irods_db_username: "irods"
 

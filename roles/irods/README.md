@@ -1,8 +1,8 @@
 iRODS
 =========
 
-Installs and configures iRODS service on RHEL/CentOS servers. Catalog database
-is installed with PostgreSQL backend.
+Installs and configures iRODS service on RHEL/CentOS or Ubuntu (18.04 bionic) servers.  
+Catalog database is installed with PostgreSQL backend.
 
 Requirements
 ------------

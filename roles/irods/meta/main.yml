@@ -16,6 +16,9 @@ galaxy_info:
     - name: CentOS
       versions:
         - 7
+    - name: Ubuntu
+      versions:
+        - bionic
 
   galaxy_tags: []
 
