@@ -14,6 +14,13 @@
     irods_zone_key: "VERY_SECRET_KEY"
     irods_cs_ssl: true
   tasks:
+    # Ubuntu stuff
+    - name: Update repositories cache (if older than 1 day) (debian)
+      apt:
+        update_cache: true
+        cache_valid_time: 86400
+      when: ansible_os_family == 'Debian'
+
     # database stuff
     - name: "Include tasks fill-etc-hosts (irods_db_host)"
       include_role:
