@@ -7,7 +7,8 @@ lint: |
   yamllint .
   # exclude SSL task until https://github.com/ansible/ansible-lint/pull/642 is
   # resolved. (ansible-lint 4.3?)
-  ansible-lint --exclude=tasks/create_selfsigned_certificates.yml
+  ansible-lint --exclude=tasks/create_selfsigned_certificates.yml \
+               --exclude=molecule/default/vars.yml
 platforms:
   - name: icat
     image: geerlingguy/docker-${MOLECULE_DISTRO:-centos7}-ansible:latest
