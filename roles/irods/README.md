@@ -29,6 +29,8 @@ List of catalog provider servers.
 
 List of other hosts in the configured zone (resource servers).
 
+**Note: Each iRODS host should define a variable `irods_ip` in the inventory, corresponding to the IP address of the iRODS server.** If not the case, this role will use ansible gathered facts.
+
     irods_default_resource_name: "demoResc"
 
 Name of default resource (used in `server_config.json` and service account `irods_environment.json`).

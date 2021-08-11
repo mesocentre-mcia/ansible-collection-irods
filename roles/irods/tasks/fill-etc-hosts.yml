@@ -1,5 +1,6 @@
 ---
 
+
 - name: Provide irods_etc_hosts definitions
   vars:
     # yamllint disable-line rule:line-length
@@ -8,8 +9,9 @@
     irods_etc_hosts: >-
       {{ irods_etc_hosts | default([]) +
       [ {'hostname' : item,
-         'ip' : hostvars[item].ansible_default_ipv4.address,
-         'fqdn' : hostvars[item].ansible_facts.hostnqn},
+         'ip' : hostvars[item].irods_ip if 'irods_ip' in hostvars[item] else
+                hostvars[item].ansible_default_ipv4.address,
+         'fqdn' : hostvars[item].inventory_hostname},
       ] }}
   loop: "{{ all_hosts }}"
 
