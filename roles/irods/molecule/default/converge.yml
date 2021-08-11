@@ -13,6 +13,11 @@
   tasks:
     - name: "include scenario common variables"
       include_vars: "vars.yml"
+    - name: Update repositories cache (if older than 1 day) (debian)
+      apt:
+        update_cache: true
+        cache_valid_time: 86400
+      when: ansible_os_family == 'Debian'
     - name: "Configure host as a database server"
       include_role:
         name: irods

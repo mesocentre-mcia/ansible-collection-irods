@@ -1,6 +1,13 @@
 ---
 # tasks file for role irods
 
+- name: include OS-specific variables
+  include_vars: "{{ item }}"
+  with_first_found:
+    - "{{ ansible_distribution }}{{ ansible_distribution_major_version }}.yml"
+    - "{{ ansible_distribution }}.yml"
+    - "{{ ansible_os_family }}.yml"
+
 # iRODS server settings
 
 - name: include service account
@@ -14,12 +21,35 @@
     enabled: true
     gpgkey: "https://packages.irods.org/irods-signing-key.asc"
     gpgcheck: true
+  when: ansible_os_family == 'RedHat'
+
+- name: ensure "gpg-agent" is installed (Ubuntu)
+  apt:
+    name: gpg-agent
+    update_cache: true
+  when: ansible_distribution == 'Ubuntu'
+
+- name: setup iRODS Ubuntu apt repository key
+  apt_key:
+    id: 9014FF9F75C66C771F1CB574BD925DBDACF9B42B
+    url: https://packages.irods.org/irods-signing-key.asc
+    state: present
+  when: ansible_distribution == 'Ubuntu'
+
+- name: setup iRODS Ubuntu 18.04 (bionic) apt repository
+  apt_repository:
+    filename: "renci-irods"
+    repo: "deb [arch=amd64] https://packages.irods.org/apt/ bionic main"
+    state: present
+  when:
+    - ansible_distribution == 'Ubuntu'
+    - ansible_distribution_version == '18.04'
 
 - name: Install iRODS server packages
   package:
     pkg:
-      - "irods-server{{ irods_package_extension }}"
-      - "irods-database-plugin-postgres{{ irods_package_extension }}"
+      - "{{ irods_server_pkgname }}"
+      - "{{ irods_database_pkgname }}"
 
 - name: iRODS various directories ownership
   file:
