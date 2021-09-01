@@ -49,6 +49,8 @@
   package:
     pkg:
       - "{{ irods_server_pkgname }}"
+      - "{{ irods_runtime_pkgname }}"
+      - "{{ irods_icommands_pkgname }}"
       - "{{ irods_database_pkgname }}"
 
 - name: iRODS various directories ownership
