@@ -420,7 +420,7 @@ def compare_hierarchies(module, from_list, to_list):
 
         if r != 0:
             module.fail_json(
-                msg='iquest cmd=\'%s\' failed with code=%s error=\'%s\'' %
+                msg='iRODS cmd=\'%s\' failed with code=%s error=\'%s\'' %
                 (' '.join(args), r, e)
             )
 
