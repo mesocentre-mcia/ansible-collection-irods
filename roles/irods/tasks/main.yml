@@ -87,6 +87,13 @@
   when:
     - irods_cs_ssl
 
+- name: Verify DH params file presence
+  shell:
+    cmd: "openssl dhparam -2 -out {{ irods_ssl_dh_params_file }} 2048"
+    creates: "{{ irods_ssl_dh_params_file }}"
+  when:
+    - irods_cs_ssl
+
 # do this first because it's nice to have a running catalog when you want to
 # start a resource server
 - name: Initialize iRODS distribution for IES (catalog server)
