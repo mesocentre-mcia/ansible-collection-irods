@@ -88,7 +88,7 @@
     - irods_cs_ssl
 
 - name: Verify DH params file presence
-  shell:
+  command:
     cmd: "openssl dhparam -2 -out {{ irods_ssl_dh_params_file }} 2048"
     creates: "{{ irods_ssl_dh_params_file }}"
   when:
