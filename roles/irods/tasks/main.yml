@@ -29,6 +29,12 @@
     update_cache: true
   when: ansible_distribution == 'Ubuntu'
 
+- name: ensure "ca-certificates" is up-to-date (Ubuntu)
+  apt:
+    name: ca-certificates
+    state: latest  # noqa package-latest
+  when: ansible_distribution == 'Ubuntu'
+
 - name: setup iRODS Ubuntu apt repository key
   apt_key:
     id: 9014FF9F75C66C771F1CB574BD925DBDACF9B42B
