@@ -2,7 +2,8 @@
 image: quay.io/ansible/toolset:3.5.0
 
 stages:
-  - test
+  - test-centos
+  - test-ubuntu
 
 variables:
   PIP_CACHE_DIR: "$CI_PROJECT_DIR/.pip"
@@ -20,13 +21,13 @@ before_script:
   - docker --version
 
 role irods (CentOS 7):
-  stage: test
+  stage: test-centos
   script:
     - cd roles/irods
     - MOLECULE_DISTRO=centos7 molecule test --all
 
 role irods (Ubuntu 18.04):
-  stage: test
+  stage: test-ubuntu
   script:
     - cd roles/irods
     - MOLECULE_DISTRO=ubuntu1804 molecule test --all
