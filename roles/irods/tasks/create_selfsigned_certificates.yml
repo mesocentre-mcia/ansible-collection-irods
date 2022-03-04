@@ -17,6 +17,9 @@
 - name: "Generate an OpenSSL private key with default values (4096 bits, RSA)"
   community.crypto.openssl_privatekey:
     path: "{{ irods_ssl_certificate_key_file }}"
+    size: 4096
+    type: RSA
+    mode: "{{ irods_ssl_key_file_mode | default('0600') }}"
     owner: irods
     group: irods
 
