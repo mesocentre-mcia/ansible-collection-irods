@@ -5,7 +5,7 @@ dependency:
   env:
     ANSIBLE_ROLES_PATH: ~/.ansible/roles/
 driver:
-  name: docker
+  name: "${DRIVER:-docker}"
 lint: |
   yamllint .
   # exclude SSL task until https://github.com/ansible/ansible-lint/pull/642 is

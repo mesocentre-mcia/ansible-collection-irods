@@ -1,33 +1,94 @@
 ---
-image: quay.io/ansible/toolset:3.5.0
+
+image: docker:23.0.1-dind
 
 stages:
+  - docker_build
+  - docker_push
   - test-centos
   - test-ubuntu
+
+###########################
+# Docker image management #
+###########################
+
+.ci_docker:
+  before_script:
+    - >
+      echo -n $CI_REGISTRY_PASSWORD |
+      docker login -u $CI_REGISTRY_USER
+      --password-stdin $CI_REGISTRY
+  only:
+    changes:
+      - .gitlab-ci.yml
+      - ci/Dockerfile
+
+Build image:
+  extends: .ci_docker
+  stage: docker_build
+  except:
+    - tags
+  script:
+    - docker pull $CI_REGISTRY_IMAGE:latest || true
+    - >
+      docker build
+      --pull
+      --cache-from $CI_REGISTRY_IMAGE:latest
+      --label "org.opencontainers.image.title=$CI_PROJECT_TITLE"
+      --label "org.opencontainers.image.url=$CI_PROJECT_URL"
+      --label "org.opencontainers.image.created=$CI_JOB_STARTED_AT"
+      --label "org.opencontainers.image.revision=$CI_COMMIT_SHA"
+      --label "org.opencontainers.image.version=$CI_COMMIT_REF_NAME"
+      --tag $CI_REGISTRY_IMAGE:$CI_COMMIT_SHA
+      -f ci/Dockerfile
+      .
+    - docker push $CI_REGISTRY_IMAGE:$CI_COMMIT_SHA
+
+Push latest:
+  extends: .ci_docker
+  stage: docker_push
+  variables:
+    GIT_STRATEGY: none
+  only:
+    refs:
+      - master
+      - ci_test
+  except:
+    - tags
+  script:
+    - docker pull $CI_REGISTRY_IMAGE:$CI_COMMIT_SHA
+    - docker tag $CI_REGISTRY_IMAGE:$CI_COMMIT_SHA $CI_REGISTRY_IMAGE:latest
+    - docker push $CI_REGISTRY_IMAGE:latest
+
+#############
+# CI Test   #
+#############
+
+.ci_molecule:
+  image: $CI_REGISTRY_IMAGE:latest
+
+  before_script:
+    - python3 -V
+    - pip3 install ansible molecule docker
+    - ansible --version
+    - molecule --version
+    - docker --version
+
 
 variables:
   PIP_CACHE_DIR: "$CI_PROJECT_DIR/.pip"
   GIT_STRATEGY: clone
 
-cache:
-  paths:
-    - .pip/
-
-before_script:
-  - python3 -V
-  - pip3 install ansible molecule docker
-  - ansible --version
-  - molecule --version
-  - docker --version
-
 role irods (CentOS 7):
+  extends: .ci_molecule
   stage: test-centos
   script:
     - cd roles/irods
-    - MOLECULE_DISTRO=centos7 molecule test --all
+    - MOLECULE_DISTRO=centos7 DRIVER=podman molecule test --all
 
 role irods (Ubuntu 18.04):
+  extends: .ci_molecule
   stage: test-ubuntu
   script:
     - cd roles/irods
-    - MOLECULE_DISTRO=ubuntu1804 molecule test --all
+    - MOLECULE_DISTRO=ubuntu1804 DRIVER=podman molecule test --all
