@@ -1,8 +1,8 @@
 ---
 # tasks file for role irods
 
-- name: include OS-specific variables
-  include_vars: "{{ item }}"
+- name: Include OS-specific variables
+  ansible.builtin.include_vars: "{{ item }}"
   with_first_found:
     - "{{ ansible_distribution }}{{ ansible_distribution_major_version }}.yml"
     - "{{ ansible_distribution }}.yml"
@@ -10,11 +10,11 @@
 
 # iRODS server settings
 
-- name: include service account
-  include_tasks: service-account.yml
+- name: Include service account
+  ansible.builtin.include_tasks: service-account.yml
 
-- name: setup iRODS CentOS Yum repository
-  yum_repository:
+- name: Setup iRODS CentOS Yum repository
+  ansible.builtin.yum_repository:
     name: "renci-irods"
     description: "RENCI iRODS Repository"
     baseurl: "https://packages.irods.org/yum/pool/centos$releasever/$basearch"
@@ -23,27 +23,27 @@
     gpgcheck: true
   when: ansible_os_family == 'RedHat'
 
-- name: ensure "gpg-agent" is installed (Ubuntu)
-  apt:
+- name: Ensure "gpg-agent" is installed (Ubuntu)
+  ansible.builtin.apt:
     name: gpg-agent
     update_cache: true
   when: ansible_distribution == 'Ubuntu'
 
-- name: ensure "ca-certificates" is up-to-date (Ubuntu)
-  apt:
+- name: Ensure "ca-certificates" is up-to-date (Ubuntu)
+  ansible.builtin.apt:
     name: ca-certificates
     state: latest  # noqa package-latest
   when: ansible_distribution == 'Ubuntu'
 
-- name: setup iRODS Ubuntu apt repository key
-  apt_key:
+- name: Setup iRODS Ubuntu apt repository key
+  ansible.builtin.apt_key:
     id: 9014FF9F75C66C771F1CB574BD925DBDACF9B42B
     url: https://packages.irods.org/irods-signing-key.asc
     state: present
   when: ansible_distribution == 'Ubuntu'
 
-- name: setup iRODS Ubuntu 18.04 (bionic) apt repository
-  apt_repository:
+- name: Setup iRODS Ubuntu 18.04 (bionic) apt repository
+  ansible.builtin.apt_repository:
     filename: "renci-irods"
     repo: "deb [arch=amd64] https://packages.irods.org/apt/ bionic main"
     state: present
@@ -80,8 +80,8 @@
   when:
     - ansible_distribution == 'Ubuntu'
 
-- name: iRODS various directories ownership
-  file:
+- name: Ensure iRODS various directories ownership
+  ansible.builtin.file:
     path: "{{ item }}"
     state: directory
     mode: 0755
@@ -92,8 +92,8 @@
     - "/var/lib/irods"
     - "/var/lib/irods/log"
 
-- name: iRODS server setup file
-  template:
+- name: Install iRODS server setup file
+  ansible.builtin.template:
     src: "templates/setup_irods.json.j2"
     dest: "/etc/irods/setup_irods.json"
     mode: 0600
@@ -102,7 +102,7 @@
   when: ansible_role_irods_is_catalog
 
 - name: Check SSL certificate availability
-  file:
+  ansible.builtin.file:
     path: "{{ item.path }}"
     mode: "{{ item.mode }}"
     owner: irods
@@ -115,7 +115,7 @@
     - irods_cs_ssl
 
 - name: Verify DH params file presence
-  command:
+  ansible.builtin.command:
     cmd: "openssl dhparam -2 -out {{ irods_ssl_dh_params_file }} 2048"
     creates: "{{ irods_ssl_dh_params_file }}"
   when:
@@ -124,16 +124,16 @@
 # do this first because it's nice to have a running catalog when you want to
 # start a resource server
 - name: Initialize iRODS distribution for IES (catalog server)
-  include_tasks: irods-configure-ies.yml
+  ansible.builtin.include_tasks: irods-configure-ies.yml
   when:
     - ansible_role_irods_is_catalog
 
 # trigger handlers for catalog
-- name: flush handlers
-  meta: flush_handlers
+- name: Flush handlers
+  ansible.builtin.meta: flush_handlers
 
 # then configure other servers
 - name: Initialize iRODS distribution for non-IES (resource only server)
-  include_tasks: irods-configure-nonies.yml
+  ansible.builtin.include_tasks: irods-configure-nonies.yml
   when:
     - not ansible_role_irods_is_catalog

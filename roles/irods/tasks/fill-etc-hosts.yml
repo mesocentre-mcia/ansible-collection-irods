@@ -5,7 +5,7 @@
   vars:
     # yamllint disable-line rule:line-length
     all_hosts: "{{ ([irods_db_host] + irods_hosts) | reject('eq', 'localhost') | unique | list }}"
-  set_fact:
+  ansible.builtin.set_fact:
     irods_etc_hosts: >-
       {{ irods_etc_hosts | default([]) +
       [ {'hostname' : item,
@@ -16,7 +16,7 @@
   loop: "{{ all_hosts }}"
 
 - name: Put irods_etc_hosts into /etc/hosts
-  lineinfile:
+  ansible.builtin.lineinfile:
     path: "/etc/hosts"
     unsafe_writes: true  # avoid problems with systemd/docker mounted file
     line: "{{ item.ip }} {{ item.fqdn }} {{ item.hostname }}"

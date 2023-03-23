@@ -11,21 +11,25 @@
     irods_server_control_plane_key: "12345678901234567890123456789012"
     irods_zone_key: "VERY_SECRET_KEY"
   tasks:
-    - name: "include scenario common variables"
-      include_vars: "vars.yml"
+    - name: "Include scenario common variables"
+      ansible.builtin.include_vars: "vars.yml"
+
     - name: Update repositories cache (if older than 1 day) (debian)
-      apt:
+      ansible.builtin.apt:
         update_cache: true
         cache_valid_time: 86400
       when: ansible_os_family == 'Debian'
+
     - name: "Configure host as a database server"
-      include_role:
+      ansible.builtin.include_role:
         name: irods
         tasks_from: "database-role-PostgreSQL"
-    - name: "create iRODS database on server"
-      include_role:
+
+    - name: "Create iRODS database on server"
+      ansible.builtin.include_role:
         name: irods
         tasks_from: "database-configure-PostgreSQL"
+
     - name: "Include irods ansible role"
-      include_role:
+      ansible.builtin.include_role:
         name: irods

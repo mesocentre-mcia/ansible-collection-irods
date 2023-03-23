@@ -4,43 +4,49 @@
 - name: Verify iRODS package version
   hosts: all
   tasks:
-    - name: "include scenario common variables"
-      include_vars: "vars.yml"
-    - name: "test if iRODS version is {{ irods_version }}"
-      shell:
+    - name: "Include scenario common variables"
+      ansible.builtin.include_vars: "vars.yml"
+
+    - name: "Test if iRODS version is {{ irods_version }}"
+      ansible.builtin.shell:
         cmd: "ienv | grep irods_version | awk '{print $3}'"
       register: verify_version
       become: true
       become_user: irods
       changed_when: false
-    - name: assertions
-      assert:
+
+    - name: Assertions
+      ansible.builtin.assert:
         that:
           - verify_version.stdout == "{{ irods_version }}"
 
 - name: Verify simple iput/iget commands
   hosts: all
   tasks:
-    - name: test iput
-      command: "iput -f /var/lib/irods/VERSION.json"
+    - name: Test iput
+      ansible.builtin.command: "iput -f /var/lib/irods/VERSION.json"
       register: verify_iput
       become: true
       become_user: irods
       changed_when: false
-    - name: test iget
-      command: "iget -f VERSION.json /tmp"
+
+    - name: Test iget
+      ansible.builtin.command: "iget -f VERSION.json /tmp"
       register: verify_iget
       become: true
       become_user: irods
       changed_when: false
-    - name: tset iget/iput results
-      command: "cmp /var/lib/irods/VERSION.json /tmp/VERSION.json"
+
+    - name: Test iget/iput results
+      ansible.builtin.command:
+        "cmp /var/lib/irods/VERSION.json /tmp/VERSION.json"
       register: verify_igetiput_diff
       become: true
       become_user: irods
       changed_when: false
-    - name: assertions
-      assert:
+
+    - name: Assertions
+      ansible.builtin.assert:
         that:
           - verify_iput.rc == 0
           - verify_iget.rc == 0

@@ -3,16 +3,17 @@
 # init iRODS distribution for IES
 
 - name: Check if we need to initialize iRODS distribution
-  command: "test -f /var/lib/irods/VERSION.json"
+  ansible.builtin.command: "test -f /var/lib/irods/VERSION.json"
   register: irods_initialized
   failed_when: false
   changed_when: irods_initialized.rc != 0
 
 - name: Initialize iRODS distribution for IES (catalog server)
-  # yamllint disable-line rule:line-length
-  command: "python /var/lib/irods/scripts/setup_irods.py --json_configuration_file=/etc/irods/setup_irods.json"
+  ansible.builtin.command:
+    python /var/lib/irods/scripts/setup_irods.py
+    --json_configuration_file=/etc/irods/setup_irods.json
   when:
     - irods_initialized.rc != 0
 
-# configure iRODS server
-- include_tasks: irods.yml
+- name: Configure iRODS server
+  ansible.builtin.include_tasks: irods.yml

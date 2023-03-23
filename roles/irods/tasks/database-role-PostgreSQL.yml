@@ -2,7 +2,7 @@
 # PostgreSQL database server configuration
 
 - name: Setup Catalog Database
-  include_role:
+  ansible.builtin.include_role:
     name: geerlingguy.postgresql
   vars:
     postgresql_global_config_options:

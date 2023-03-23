@@ -25,9 +25,8 @@ irods_db_name: "ICAT"
 # ODBC driver for postgres:
 # CentOS: "PostgreSQL"
 # Ubuntu: "PostgreSQL ANSI" or "PostgreSQL Unicode"
-irods_db_odbc_driver: "{{ (ansible_distribution == 'Ubuntu')|ternary(
-                          'PostgreSQL ANSI',
-                          'PostgreSQL')
+irods_db_odbc_driver: "{{ (ansible_distribution == 'Ubuntu')
+                           | ternary('PostgreSQL ANSI', 'PostgreSQL')
                        }}"
 irods_db_port: 5432
 irods_db_username: "irods"

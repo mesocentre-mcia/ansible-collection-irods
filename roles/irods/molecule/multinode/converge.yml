@@ -16,37 +16,37 @@
   tasks:
     # Ubuntu stuff
     - name: Update repositories cache (if older than 1 day) (debian)
-      apt:
+      ansible.builtin.apt:
         update_cache: true
         cache_valid_time: 86400
       when: ansible_os_family == 'Debian'
 
     # database stuff
     - name: "Include tasks fill-etc-hosts (irods_db_host)"
-      include_role:
+      ansible.builtin.include_role:
         # catalog needs to know how to connect to irods_db_host
         name: irods
         tasks_from: "fill-etc-hosts"
 
     - name: "Configure host as a database server"
-      include_role:
+      ansible.builtin.include_role:
         name: irods
         tasks_from: "database-role-PostgreSQL"
       when: inventory_hostname == irods_db_host
 
-    - name: "create iRODS database on server"
-      include_role:
+    - name: "Create iRODS database on server"
+      ansible.builtin.include_role:
         name: irods
         tasks_from: "database-configure-PostgreSQL"
       when: inventory_hostname == irods_db_host
 
     # prepare hosts for SSL setup with self-signed certificates
     - name: "Include ansible-role-irods"
-      include_role:
+      ansible.builtin.include_role:
         name: irods
         tasks_from: "create_selfsigned_certificates.yml"
 
     # run irods role
     - name: "Include irods ansible role"
-      include_role:
+      ansible.builtin.include_role:
         name: irods

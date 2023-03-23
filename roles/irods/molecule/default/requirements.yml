@@ -1,4 +1,4 @@
 ---
 
 roles:
-  - geerlingguy.postgresql
+  - name: geerlingguy.postgresql

@@ -2,13 +2,13 @@
 # PostgreSQL server database setup
 
 - name: Create iRODS database
-  postgresql_db:
+  community.postgresql.postgresql_db:
     name: "{{ irods_db_name }}"
   become_user: postgres
   become: true
 
 - name: Add irods user to iRODS database
-  postgresql_user:
+  community.postgresql.postgresql_user:
     db: "{{ irods_db_name }}"
     name: "{{ irods_db_username }}"
     password: "{{ irods_db_password }}"
