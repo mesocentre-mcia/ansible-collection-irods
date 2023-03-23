@@ -7,8 +7,13 @@
   vars:
     postgresql_global_config_options:
       - option: listen_addresses
-        # yamllint disable-line rule:line-length
-        value: "{{ 'localhost' if irods_db_host in ['localhost', irods_catalog_provider_hosts[0]] else '*' }}"
+        value:
+          "{{ 'localhost'
+              if irods_db_host in ['localhost', irods_catalog_provider_hosts[0]]
+              else '*'
+          }}"
+      - option: log_directory
+        value: log
     postgresql_hba_entries:
       - type: local
         database: all
