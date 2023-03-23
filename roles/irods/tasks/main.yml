@@ -52,12 +52,33 @@
     - ansible_distribution_version == '18.04'
 
 - name: Install iRODS server packages
-  package:
+  ansible.builtin.package:
     pkg:
       - "{{ irods_server_pkgname }}"
       - "{{ irods_runtime_pkgname }}"
       - "{{ irods_icommands_pkgname }}"
       - "{{ irods_database_pkgname }}"
+
+- name: Ensure iRODS server packages are version-locked (RedHat)
+  community.general.yum_versionlock:
+    state: present
+    name:
+      - "{{ irods_server_pkgname }}"
+      - "{{ irods_runtime_pkgname }}"
+      - "{{ irods_icommands_pkgname }}"
+      - "{{ irods_database_pkgname }}"
+  when: ansible_os_family == 'RedHat'
+
+- name: Ensure iRODS server packages are version-locked (Ubuntu)
+  community.general.dpkg_selection:
+    selection: hold
+    name:
+      - "{{ irods_server_pkgname }}"
+      - "{{ irods_runtime_pkgname }}"
+      - "{{ irods_icommands_pkgname }}"
+      - "{{ irods_database_pkgname }}"
+  when:
+    - ansible_distribution == 'Ubuntu'
 
 - name: iRODS various directories ownership
   file:
