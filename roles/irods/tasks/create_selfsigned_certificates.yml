@@ -1,11 +1,11 @@
 ---
 # prepare hosts for SSL setup with self-signed certificates
 
-- name: include service account
-  include_tasks: service-account.yml
+- name: Include service account
+  ansible.builtin.include_tasks: service-account.yml
 
-- name: create certificates directory
-  file:
+- name: Create certificates directory
+  ansible.builtin.file:
     path: "{{ item.path | dirname }}"
     state: directory
     mode: 0755
@@ -40,22 +40,35 @@
     owner: irods
     group: irods
 
-- name: Wait for {{ irods_ssl_certificate_chain_file }} before continuing
-  wait_for:
+- name: Wait for SSL chain file before continuing
+  ansible.builtin.wait_for:
     path: "{{ irods_ssl_certificate_chain_file }}"
 
-- name: localhost cleanup
-  file:
+- name: Localhost cleanup
+  ansible.builtin.file:
     path: "/tmp/ansible-role-irods/certs/"
     state: absent
+  delegate_to: localhost
+  become: false
+  run_once: true
+
+- name: Recreate localhost certs directory
+  ansible.builtin.file:
+    path: "/tmp/ansible-role-irods/certs/"
+    state: directory
+    mode: 0755
+  delegate_to: localhost
+  become: false
+  run_once: true
 
 - name: Get hosts certificates
-  fetch:
+  ansible.builtin.fetch:
     src: "{{ irods_ssl_certificate_chain_file }}"
     dest: "/tmp/ansible-role-irods/certs/"
+  become: false
 
 - name: Distribute hosts certificates
-  copy:
+  ansible.builtin.copy:
     src: "/tmp/ansible-role-irods/certs/{{ item }}/etc/irods/certs/server.crt"
     dest: "/tmp/{{ item }}.crt"
     owner: irods
@@ -64,7 +77,7 @@
   loop: "{{ play_hosts }}"
 
 - name: Gather hosts certificates into a bundle ca.crt
-  assemble:
+  ansible.builtin.assemble:
     src: "/tmp"
     regexp: "^.*\\.crt$"
     dest: "{{ irods_ssl_ca_certificate_file }}"
