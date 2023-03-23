@@ -13,7 +13,7 @@
               else '*'
           }}"
       - option: log_directory
-        value: log
+        value: pg_log
     postgresql_hba_entries:
       - type: local
         database: all
