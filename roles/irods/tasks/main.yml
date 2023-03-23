@@ -70,7 +70,7 @@
   when: ansible_os_family == 'RedHat'
 
 - name: Ensure iRODS server packages are version-locked (Ubuntu)
-  community.general.dpkg_selection:
+  ansible.builtin.dpkg_selections:
     selection: hold
     name:
       - "{{ irods_server_pkgname }}"
