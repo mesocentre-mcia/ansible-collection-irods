@@ -22,5 +22,5 @@ galaxy_info:
   galaxy_tags: []
 
 dependencies:
-  - name: community.general
-  - name: community.postgresql
+  - community.general
+  - community.postgresql
