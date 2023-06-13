@@ -16,8 +16,10 @@
   loop: "{{ all_hosts }}"
 
 - name: Put irods_etc_hosts into /etc/hosts
-  ansible.builtin.lineinfile:
+  ansible.builtin.blockinfile:
     path: "/etc/hosts"
     unsafe_writes: true  # avoid problems with systemd/docker mounted file
-    line: "{{ item.ip }} {{ item.fqdn }} {{ item.hostname }}"
-  loop: "{{ irods_etc_hosts }}"
+    block: |
+      {% for item in irods_etc_hosts %}
+      {{ item.ip }} {{ item.fqdn }} {{ item.hostname }}
+      {% endfor %}
