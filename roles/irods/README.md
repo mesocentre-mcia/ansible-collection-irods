@@ -93,6 +93,7 @@ Here is a two hosts example playbook:
 * client/server SSL negotiation is requested
 * server self-signed certificates are installed
 
+```yaml
     - name: Converge
       hosts: all
       vars:
@@ -135,3 +136,4 @@ Here is a two hosts example playbook:
         - name: "Include irods ansible role"
           include_role:
             name: irods
+```
