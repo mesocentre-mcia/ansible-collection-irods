@@ -3,7 +3,7 @@
 # init iRODS distribution for non-IES
 
 - name: Check if we need to initialize iRODS distribution
-  ansible.builtin.command: "test -f /var/lib/irods/VERSION.json"
+  ansible.builtin.command: "test -f {{ irods_version_file }}"
   register: irods_initialized
   failed_when: false
   changed_when: irods_initialized.rc != 0
@@ -11,7 +11,7 @@
 # mimic setup_irods.py except for creating default resources with fixed path
 - name: Initialize iRODS distribution for non-IES (resource only server)
   ansible.builtin.command:
-    "cp /var/lib/irods/VERSION.json.dist /var/lib/irods/VERSION.json"
+    "cp {{ irods_version_file }}.dist {{ irods_version_file }}"
   when:
     - irods_initialized.rc != 0
 

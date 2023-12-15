@@ -7,6 +7,8 @@ irods_catalog_provider_hosts: ["localhost"]
 irods_hosts: []
 
 irods_default_resource_name: "demoResc"
+irods_config_schema_version: "v4"
+irods_version_file: /var/lib/irods/version.json
 
 # set null for latest version
 irods_version: null

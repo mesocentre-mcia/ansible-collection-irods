@@ -2,7 +2,7 @@
 
 - name: Install iRODS server configuration file
   ansible.builtin.template:
-    src: "templates/server_config.json.j2"
+    src: "templates/{{ irods_config_schema_version }}/server_config.json.j2"
     dest: "/etc/irods/server_config.json"
     mode: 0600
     owner: irods
@@ -50,7 +50,7 @@
 
 - name: Install iRODS service account environment file
   ansible.builtin.template:
-    src: "templates/service_account_irods_environment.json.j2"
+    src: "templates/{{ irods_config_schema_version }}/service_account_irods_environment.json.j2"
     dest: "/var/lib/irods/.irods/irods_environment.json"
     mode: 0600
     owner: irods
@@ -60,7 +60,7 @@
 
 - name: Initialize iRODS admin password in service account environment
   ansible.builtin.shell:
-    cmd: "iinit {{ irods_admin_password }} || test $? -eq 2"
+    cmd: "echo {{ irods_admin_password }} | iinit || test $? -eq 2" 
     # return code 2 is ok (irods server not reached, but password written)
     creates: "/var/lib/irods/.irods/.irodsA"
   become: true
