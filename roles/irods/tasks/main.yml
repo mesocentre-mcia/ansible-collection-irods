@@ -17,7 +17,7 @@
   ansible.builtin.yum_repository:
     name: "renci-irods"
     description: "RENCI iRODS Repository"
-    baseurl: "https://packages.irods.org/yum/pool/centos$releasever/$basearch"
+    baseurl: "https://packages.irods.org/yum/pool/el$releasever/$basearch"
     enabled: true
     gpgkey: "https://packages.irods.org/irods-signing-key.asc"
     gpgcheck: true
@@ -59,8 +59,14 @@
       - "{{ irods_icommands_pkgname }}"
       - "{{ irods_database_pkgname }}"
 
+- name: Install plugin version-locked (RedHat)
+  ansible.builtin.package:
+    state: present
+    name: python3-dnf-plugin-versionlock
+  when: ansible_os_family == 'RedHat'
+
 - name: Ensure iRODS server packages are version-locked (RedHat)
-  community.general.yum_versionlock:
+  community.general.dnf_versionlock:
     state: present
     name:
       - "{{ irods_server_pkgname }}"
@@ -120,6 +126,14 @@
     creates: "{{ irods_ssl_dh_params_file }}"
   when:
     - irods_cs_ssl
+
+- name: Set correct acPreconnect rule
+  ansible.builtin.lineinfile:
+    path: /etc/irods/core.re
+    regexp: '^\s*acPreConnect\(\*OUT\) \{ \*OUT=".*"; \}$'
+    line: 'acPreConnect(*OUT) { *OUT="CS_NEG_REQUIRE"; }'
+  when: irods_cs_ssl
+  notify: Restart irods
 
 # do this first because it's nice to have a running catalog when you want to
 # start a resource server
