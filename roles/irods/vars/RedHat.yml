@@ -1,13 +1,20 @@
----
 # vars file for RedHat
+---
 
-# yamllint disable-line rule:line-length
-irods_package_extension: "{{ '' if irods_version is none else '-' + irods_version }}"
-# yamllint disable-line rule:line-length
+dnf_versionlock_package: python3-dnf-plugin-versionlock
+
+irods_package_extension: |
+  {{ '' if irods_version is none else '-' + irods_version }}
+
 irods_server_pkgname: "irods-server{{ irods_package_extension }}"
-# yamllint disable-line rule:line-length
+
+# To force an specific version
+# and avoid error "unmet dependencies"
+# (Depends: irods-runtime (= 4.2.9) but 4.2.10 is to be installed)
+# we have to specify dependencies version
 irods_runtime_pkgname: "irods-runtime{{ irods_package_extension }}"
-# yamllint disable-line rule:line-length
+
 irods_icommands_pkgname: "irods-icommands{{ irods_package_extension }}"
-# yamllint disable-line rule:line-length
-irods_database_pkgname: "irods-database-plugin-postgres{{ irods_package_extension }}"
+
+irods_database_pkgname: |
+  irods-database-plugin-postgres{{ irods_package_extension }}

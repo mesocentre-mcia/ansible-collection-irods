@@ -1,16 +1,15 @@
+# vars file for RedHat
 ---
-# vars file for role irods
 
-# yamllint disable-line rule:line-length
-ansible_role_irods_is_catalog: |
-  {{ inventory_hostname in irods_catalog_provider_hosts
-     or 'localhost' in irods_catalog_provider_hosts }}
+dnf_versionlock_package: python2-dnf-plugin-versionlock
 
 irods_package_extension: |
-  {{ '' if irods_version is none else '=' + irods_version }}
+  {{ '' if irods_version is none else '-' + irods_version }}
+
 irods_server_pkgname: "irods-server{{ irods_package_extension }}"
 
-# To force an specific version# and avoid error "unmet dependencies"
+# To force an specific version
+# and avoid error "unmet dependencies"
 # (Depends: irods-runtime (= 4.2.9) but 4.2.10 is to be installed)
 # we have to specify dependencies version
 irods_runtime_pkgname: "irods-runtime{{ irods_package_extension }}"

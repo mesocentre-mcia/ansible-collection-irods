@@ -4,7 +4,8 @@
 - name: Include OS-specific variables
   ansible.builtin.include_vars: "{{ item }}"
   with_first_found:
-    - "{{ ansible_distribution }}{{ ansible_distribution_major_version }}.yml"
+    - "{{ ansible_distribution }}-{{ ansible_distribution_major_version }}.yml"
+    - "{{ ansible_os_family }}-{{ ansible_distribution_major_version }}.yml"
     - "{{ ansible_distribution }}.yml"
     - "{{ ansible_os_family }}.yml"
 
@@ -62,11 +63,11 @@
 - name: Install plugin version-locked (RedHat)
   ansible.builtin.package:
     state: present
-    name: python3-dnf-plugin-versionlock
+    name: "{{ dnf_versionlock_package }}"
   when: ansible_os_family == 'RedHat'
 
 - name: Ensure iRODS server packages are version-locked (RedHat)
-  community.general.dnf_versionlock:
+  community.general.yum_versionlock:
     state: present
     name:
       - "{{ irods_server_pkgname }}"

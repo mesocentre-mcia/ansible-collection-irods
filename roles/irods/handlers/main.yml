@@ -2,10 +2,16 @@
 # handlers file for ansible-role-irods
 
 - name: Stop irods
-  ansible.builtin.command: /etc/init.d/irods stop
+  ansible.builtin.systemd_service:
+    name: irods
+    state: stopped
 
 - name: Start irods
-  ansible.builtin.command: /etc/init.d/irods start
+  ansible.builtin.systemd_service:
+    name: irods
+    state: started
 
 - name: Restart irods
-  ansible.builtin.command: /etc/init.d/irods restart
+  ansible.builtin.systemd_service:
+    name: irods
+    state: restarted
