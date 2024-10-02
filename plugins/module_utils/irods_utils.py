@@ -579,7 +579,7 @@ def irods_check_client(module, host, port, zone, user, auth_file):
     return True
 
 
-def irods_init_client(module, host, port, zone, user, password, auth_file):
+def irods_init_client(module, host, port, zone, user, password, auth_file, version='4.2', ssl=True):
     env = dict(
         IRODS_USER_NAME=user,
         IRODS_AUTHENTICATION_FILE=auth_file,
@@ -589,7 +589,14 @@ def irods_init_client(module, host, port, zone, user, password, auth_file):
 
     iinit = IrodsInit()
 
-    r, o, e = module.run_command(iinit([password]), environ_update=env)
+    if version == '4.3':
+        cmdline = []
+        if ssl:
+            cmdline.append('--with-ssl')
+
+        r, o, e = module.run_command(iinit(cmdline), data=password, environ_update=env)
+    else:
+        r, o, e = module.run_command(iinit([password]), environ_update=env)
 
     if r == CAT_INVALID_AUTHENTICATION:
         return False
@@ -600,13 +607,13 @@ def irods_init_client(module, host, port, zone, user, password, auth_file):
     return True
 
 
-def check_irods_password(module, host, port, zone, user, password):
+def check_irods_password(module, host, port, zone, user, password, version, ssl):
     fd, pwdfile = mkstemp()
     try:
         os.close(fd)
 
         return irods_init_client(module, host, port, zone, user, password,
-                                 pwdfile)
+                                 pwdfile, version, ssl)
 
     finally:
         os.unlink(pwdfile)

@@ -52,6 +52,15 @@
     - ansible_distribution == 'Ubuntu'
     - ansible_distribution_version == '18.04'
 
+- name: Install iRODS server requirements packages
+  ansible.builtin.package:
+    pkg: "{{ irods_server_requirements_pkgs }}"
+
+- name: Install iRODS IES requirements packages
+  ansible.builtin.package:
+    pkg: "{{ irods_ies_requirements_pkgs }}"
+  when: ansible_role_irods_is_catalog
+
 - name: Install iRODS server packages
   ansible.builtin.package:
     pkg:
@@ -91,7 +100,7 @@
   ansible.builtin.file:
     path: "{{ item }}"
     state: directory
-    mode: 0755
+    mode: "0755"
     owner: irods
     group: irods
   loop:
@@ -103,7 +112,7 @@
   ansible.builtin.template:
     src: "templates/setup_irods.json.j2"
     dest: "/etc/irods/setup_irods.json"
-    mode: 0600
+    mode: "0600"
     owner: irods
     group: irods
   when: ansible_role_irods_is_catalog

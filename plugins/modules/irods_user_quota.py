@@ -150,30 +150,41 @@ def params_to_quotas(params):
 
     return quotas, group_quotas
 
-def qprint(q):
+def qprint(q, type):
     return ' '.join([
         'iadmin',
-        'suq',
+        f's{type}q',
         q['QUOTA_USER_NAME'] + '#' + q['QUOTA_USER_ZONE'],
         q['QUOTA_RESC_ID'],
         str(q['QUOTA_LIMIT']),
     ])
 
-def quotas_to_string(quotas):
+def quotas_to_string(quotas, type):
 
-    return '\n'.join([qprint(quotas[k]) for k in sorted(quotas.keys())]) + '\n'
+    return '\n'.join([qprint(quotas[k], type) for k in sorted(quotas.keys())]) + '\n'
 
-def set_user_quota(module, user, zone, resource, limit):
+
+def set_quota(module, type, user, zone, resource, limit):
     iadmin = IrodsAdmin()
 
-    cmd = ['suq', user + '#' + zone, resource, str(limit)]
+    cmd = [f's{type}q', user + '#' + zone, resource, str(limit)]
     r, o, e = module.run_command(iadmin(cmd))
+    module.warn(f'set_quota {cmd}')
 
     if r != 0:
         module.fail_json(
             msg='iadmin cmd=\'%s\' failed with code=%s error=\'%s\'' %
             (cmd, r, e)
         )
+
+
+def set_user_quota(module, user, zone, resource, limit):
+    return set_quota(module, 'u', user, zone, resource, limit)
+
+
+def set_group_quota(module, user, zone, resource, limit):
+    return set_quota(module, 'g', user, zone, resource, limit)
+
 
 def main():
     module_args = dict(
@@ -203,40 +214,54 @@ def main():
 
     got = get_quotas(module)
 
-    wanted, group_quotas = params_to_quotas(module.params)
+    user_quotas, group_quotas = params_to_quotas(module.params)
 
     user_groups = get_user_groups(module, module.params['zone'])
 
-    for g, q in group_quotas.items():
-        for u in user_groups[g]:
-            if u not in wanted:
-                wanted[u] = got[u].copy()
-                wanted[u]['QUOTA_LIMIT'] = q['QUOTA_LIMIT']
+
+    # for g, q in group_quotas.items():
+    #     for u in user_groups[g]:
+    #         if u not in user_quotas:
+    #             user_quotas[u] = got[u].copy()
+    #             user_quotas[u]['QUOTA_LIMIT'] = q['QUOTA_LIMIT']
 
     # filter got users with those specified in params
-    got = {k: v.copy() for k, v in got.items() if k in wanted}
+    got_users = {k: v.copy() for k, v in got.items() if k in user_quotas}
+    got_groups = {k: v.copy() for k, v in got.items() if k in group_quotas}
 
-    if got != wanted:
+
+    if got_users != user_quotas | got_groups !=group_quotas:
         result['changed'] = True
 
     if module._diff:
         result['diff'] = dict(
-            before=quotas_to_string(got),
-            after=quotas_to_string(wanted)
+            before=(quotas_to_string(got_users, 'u') + quotas_to_string(got_groups, 'g')).strip(),
+            after=(quotas_to_string(user_quotas, 'u') + quotas_to_string(group_quotas, 'g')).strip()
         )
 
     if module.check_mode or not result['changed']:
         module.exit_json(**result)
 
-    for k, v in got.items():
-        w = wanted[k]
+    for k, v in user_quotas.items():
+        w = got_users[k]
         if v != w:
-            result['operations'].append(qprint(w))
+            result['operations'].append(qprint(v, 'u'))
             set_user_quota(module,
-                           w['QUOTA_USER_NAME'],
-                           w['QUOTA_USER_ZONE'],
-                           w['QUOTA_RESC_ID'],
-                           w['QUOTA_LIMIT'])
+                           v['QUOTA_USER_NAME'],
+                           v['QUOTA_USER_ZONE'],
+                           v['QUOTA_RESC_ID'],
+                           v['QUOTA_LIMIT'])
+            
+
+    for k, v in group_quotas.items():
+        w = got_groups[k]
+        if v != w:
+            result['operations'].append(qprint(v, 'g'))
+            set_group_quota(module,
+                           v['QUOTA_USER_NAME'],
+                           v['QUOTA_USER_ZONE'],
+                           v['QUOTA_RESC_ID'],
+                           v['QUOTA_LIMIT'])
 
     module.exit_json(**result)
 

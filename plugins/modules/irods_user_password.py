@@ -77,6 +77,8 @@ def main():
         zone=dict(type='str', required=False),
         user=dict(type='str'),
         password=dict(type='str', no_log=True),
+        ssl=dict(type='bool', default=True),
+        irods_version=dict(type='str', default='4.2'),
     )
 
     module = AnsibleModule(
@@ -94,8 +96,11 @@ def main():
     zone = module.params['zone']
     user = module.params['user']
     password = module.params['password']
+    ssl = module.params['ssl']
+    irods_version = module.params['irods_version']
 
-    ok = check_irods_password(module, host, port, zone, user, password)
+    ok = check_irods_password(module, host, port, zone, user, password,
+                              irods_version, ssl)
 
     if not ok:
         result['changed'] = True

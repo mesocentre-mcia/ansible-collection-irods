@@ -18,3 +18,6 @@ irods_icommands_pkgname: "irods-icommands{{ irods_package_extension }}"
 
 irods_database_pkgname: |
   irods-database-plugin-postgres{{ irods_package_extension }}
+
+irods_ies_requirements_pkgs:
+  - pyodbc
