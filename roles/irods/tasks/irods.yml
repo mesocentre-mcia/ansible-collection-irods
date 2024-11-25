@@ -4,7 +4,7 @@
   ansible.builtin.template:
     src: "templates/{{ irods_config_schema_version }}/server_config.json.j2"
     dest: "/etc/irods/server_config.json"
-    mode: 0600
+    mode: "0600"
     owner: irods
     group: irods
   notify:
@@ -14,7 +14,7 @@
   ansible.builtin.template:
     src: "templates/hosts_config.json.j2"
     dest: "/etc/irods/hosts_config.json"
-    mode: 0644
+    mode: "0644"
     owner: irods
     group: irods
   notify:
@@ -24,7 +24,7 @@
   ansible.builtin.template:
     src: "templates/host_access_control_config.json.j2"
     dest: "/etc/irods/host_access_control_config.json"
-    mode: 0600
+    mode: "0600"
     owner: irods
     group: irods
   notify:
@@ -34,7 +34,7 @@
   ansible.builtin.template:
     src: "templates/service_account.config.j2"
     dest: "/etc/irods/service_account.config"
-    mode: 0600
+    mode: "0600"
     owner: irods
     group: irods
   notify:
@@ -44,7 +44,7 @@
   ansible.builtin.file:
     path: "/var/lib/irods/.irods"
     state: directory
-    mode: 0700
+    mode: "0700"
     owner: irods
     group: irods
 
@@ -52,7 +52,7 @@
   ansible.builtin.template:
     src: "templates/{{ irods_config_schema_version }}/service_account_irods_environment.json.j2"
     dest: "/var/lib/irods/.irods/irods_environment.json"
-    mode: 0600
+    mode: "0600"
     owner: irods
     group: irods
   notify:
@@ -60,7 +60,7 @@
 
 - name: Initialize iRODS admin password in service account environment
   ansible.builtin.shell:
-    cmd: "echo {{ irods_admin_password }} | iinit || test $? -eq 2" 
+    cmd: "echo {{ irods_admin_password }} | iinit || test $? -eq 2"
     # return code 2 is ok (irods server not reached, but password written)
     creates: "/var/lib/irods/.irods/.irodsA"
   become: true
