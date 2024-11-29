@@ -18,6 +18,9 @@ galaxy_info:
     - name: Ubuntu
       versions:
         - bionic
+    - name: Debian
+      versions:
+        - bookworm
 
   galaxy_tags: []
 
