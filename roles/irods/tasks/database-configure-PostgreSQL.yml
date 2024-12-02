@@ -12,7 +12,23 @@
     db: "{{ irods_db_name }}"
     name: "{{ irods_db_username }}"
     password: "{{ irods_db_password }}"
-    priv: "ALL"
   no_log: true
+  become_user: postgres
+  become: true
+- name: Give irods user privileges to iRODS database
+  community.postgresql.postgresql_privs:
+    db: "{{ irods_db_name }}"
+    role: "{{ irods_db_username }}"
+    type: database
+    privs: ALL
+  become_user: postgres
+  become: true
+- name: Give irods user privileges to public schema
+  community.postgresql.postgresql_privs:
+    db: "{{ irods_db_name }}"
+    role: "{{ irods_db_username }}"
+    type: schema
+    obj: public
+    privs: ALL
   become_user: postgres
   become: true
