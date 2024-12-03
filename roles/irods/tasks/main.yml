@@ -24,24 +24,24 @@
     gpgcheck: true
   when: ansible_os_family == 'RedHat'
 
-- name: Ensure "gpg-agent" is installed (Ubuntu)
+- name: Ensure "gpg-agent" is installed (Ubuntu / Debian)
   ansible.builtin.apt:
     name: gpg-agent
     update_cache: true
-  when: ansible_distribution == 'Ubuntu'
+  when: ansible_distribution == 'Ubuntu' or ansible_distribution == 'Debian'
 
-- name: Ensure "ca-certificates" is up-to-date (Ubuntu)
+- name: Ensure "ca-certificates" is up-to-date (Ubuntu / Debian)
   ansible.builtin.apt:
     name: ca-certificates
     state: latest  # noqa package-latest
-  when: ansible_distribution == 'Ubuntu'
+  when: ansible_distribution == 'Ubuntu' or ansible_distribution == 'Debian'
 
-- name: Setup iRODS Ubuntu apt repository key
+- name: Setup iRODS Ubuntu / Debian apt repository key
   ansible.builtin.apt_key:
     id: 9014FF9F75C66C771F1CB574BD925DBDACF9B42B
     url: https://packages.irods.org/irods-signing-key.asc
     state: present
-  when: ansible_distribution == 'Ubuntu'
+  when: ansible_distribution == 'Ubuntu' or ansible_distribution == 'Debian'
 
 - name: Setup iRODS Ubuntu 18.04 (bionic) apt repository
   ansible.builtin.apt_repository:
@@ -60,6 +60,15 @@
   ansible.builtin.package:
     pkg: "{{ irods_ies_requirements_pkgs }}"
   when: ansible_role_irods_is_catalog
+
+- name: Setup iRODS Debian 12 (bookworm) apt repository
+  ansible.builtin.apt_repository:
+    filename: "renci-irods"
+    repo: "deb [arch=amd64] https://packages.irods.org/apt/ bookworm main"
+    state: present
+  when:
+    - ansible_distribution == 'Debian'
+    - ansible_distribution_major_version == '12'
 
 - name: Install iRODS server packages
   ansible.builtin.package:
@@ -85,16 +94,21 @@
       - "{{ irods_database_pkgname }}"
   when: ansible_os_family == 'RedHat'
 
-- name: Ensure iRODS server packages are version-locked (Ubuntu)
+- name: Ensure iRODS server packages are version-locked (Ubuntu / Debian)
   ansible.builtin.dpkg_selections:
     selection: hold
-    name:
-      - "{{ irods_server_pkgname }}"
-      - "{{ irods_runtime_pkgname }}"
-      - "{{ irods_icommands_pkgname }}"
-      - "{{ irods_database_pkgname }}"
+    name: "{{ item }}"
+  loop:
+    - "{{ irods_server_pkgname_short }}"
+    - "{{ irods_runtime_pkgname_short }}"
+    - "{{ irods_icommands_pkgname_short }}"
+    - "{{ irods_database_pkgname_short }}"
   when:
-    - ansible_distribution == 'Ubuntu'
+    - ansible_distribution == 'Ubuntu' or ansible_distribution == 'Debian'
+
+- name: Reload systemd to generate the sysv service support
+  ansible.builtin.systemd_service:
+    daemon_reload: true
 
 - name: Ensure iRODS various directories ownership
   ansible.builtin.file:
