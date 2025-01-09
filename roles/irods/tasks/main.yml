@@ -168,6 +168,9 @@
   when:
     - ansible_role_irods_is_catalog
 
+- name: Configure iRODS server
+  ansible.builtin.include_tasks: irods.yml
+
 # trigger handlers for catalog
 - name: Flush handlers
   ansible.builtin.meta: flush_handlers

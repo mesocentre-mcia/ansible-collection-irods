@@ -14,6 +14,3 @@
     "cp {{ irods_version_file }}.dist {{ irods_version_file }}"
   when:
     - irods_initialized.rc != 0
-
-- name: Configure iRODS server
-  ansible.builtin.include_tasks: irods.yml

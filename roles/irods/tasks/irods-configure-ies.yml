@@ -14,6 +14,3 @@
     --json_configuration_file=/etc/irods/setup_irods.json
   when:
     - irods_initialized.rc != 0
-
-- name: Configure iRODS server
-  ansible.builtin.include_tasks: irods.yml

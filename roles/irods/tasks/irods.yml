@@ -73,7 +73,7 @@
   ansible.builtin.file:
     path: "/var/lib/irods/irodsctl"
     state: file
-    mode: 0755
+    mode: "0755"
     owner: irods
     group: irods
   notify:
