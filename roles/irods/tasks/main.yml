@@ -154,11 +154,6 @@
 # do this first because it's nice to have a running catalog when you want to
 # start a resource server
 
-- name: Configure iRODS server in catalog
-  ansible.builtin.include_tasks: irods.yml
-  when:
-    - ansible_role_irods_is_catalog
-
 - name: Initialize iRODS distribution for IES (catalog server)
   ansible.builtin.include_tasks: irods-configure-ies.yml
   when:
@@ -167,11 +162,6 @@
 # trigger handlers for catalog
 - name: Flush handlers
   ansible.builtin.meta: flush_handlers
-
-- name: Configure iRODS server in resources servers
-  ansible.builtin.include_tasks: irods.yml
-  when:
-    - not ansible_role_irods_is_catalog
 
 # then configure other servers
 - name: Initialize iRODS distribution for non-IES (resource only server)
