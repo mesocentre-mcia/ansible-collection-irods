@@ -78,3 +78,13 @@
     group: irods
   notify:
     - Restart irods
+
+- name: Set correct acPreconnect rule for server to be able to connect to zone
+  ansible.builtin.lineinfile:
+    path: /etc/irods/core.re
+    regexp: '^\s*acPreConnect\(\*OUT\) \{ \*OUT=".*"; \}$'
+    line: 'acPreConnect(*OUT) { *OUT="CS_NEG_REQUIRE"; }'
+    create: true
+    mode: '0644'
+  when: irods_cs_ssl
+  notify: Restart irods

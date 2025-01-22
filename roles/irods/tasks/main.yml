@@ -151,29 +151,27 @@
   when:
     - irods_cs_ssl
 
-- name: Set correct acPreconnect rule for server to be able to connect to zone
-  ansible.builtin.lineinfile:
-    path: /etc/irods/core.re
-    regexp: '^\s*acPreConnect\(\*OUT\) \{ \*OUT=".*"; \}$'
-    line: 'acPreConnect(*OUT) { *OUT="CS_NEG_REQUIRE"; }'
-    create: true
-    mode: '0644'
-  when: irods_cs_ssl
-  notify: Restart irods
-
 # do this first because it's nice to have a running catalog when you want to
 # start a resource server
+
+- name: Configure iRODS server in catalog
+  ansible.builtin.include_tasks: irods.yml
+  when:
+    - ansible_role_irods_is_catalog
+
 - name: Initialize iRODS distribution for IES (catalog server)
   ansible.builtin.include_tasks: irods-configure-ies.yml
   when:
     - ansible_role_irods_is_catalog
 
-- name: Configure iRODS server
-  ansible.builtin.include_tasks: irods.yml
-
 # trigger handlers for catalog
 - name: Flush handlers
   ansible.builtin.meta: flush_handlers
+
+- name: Configure iRODS server in resources servers
+  ansible.builtin.include_tasks: irods.yml
+  when:
+    - not ansible_role_irods_is_catalog
 
 # then configure other servers
 - name: Initialize iRODS distribution for non-IES (resource only server)
