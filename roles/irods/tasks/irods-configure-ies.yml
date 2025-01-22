@@ -1,16 +1,13 @@
 ---
 
-# init iRODS distribution for IES
+- name: Configure iRODS server in catalog
+  ansible.builtin.include_tasks: irods.yml
 
-- name: Check if we need to initialize iRODS distribution
-  ansible.builtin.command: "test -f {{ irods_version_file }}"
-  register: irods_initialized
-  failed_when: false
-  changed_when: irods_initialized.rc != 0
+# init iRODS distribution for IES
 
 - name: Initialize iRODS distribution for IES (catalog server)
   ansible.builtin.command:
-    python3 /var/lib/irods/scripts/setup_irods.py
-    --json_configuration_file=/etc/irods/setup_irods.json
-  when:
-    - irods_initialized.rc != 0
+    cmd:
+      python3 /var/lib/irods/scripts/setup_irods.py
+      --json_configuration_file=/etc/irods/setup_irods.json
+    creates: "{{ irods_version_file }}"
