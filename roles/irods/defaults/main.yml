@@ -51,3 +51,5 @@ irods_ssl_dh_params_file: "{{ irods_ssl_default_directory }}/dhparams.pem"
 
 irods_server_requirements_pkgs: []
 irods_ies_requirements_pkgs: []
+
+irods_ies_plugins: []

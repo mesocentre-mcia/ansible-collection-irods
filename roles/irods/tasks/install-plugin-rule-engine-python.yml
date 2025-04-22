@@ -1,0 +1,14 @@
+---
+
+- name: Install Python Rule Engine Plugin package
+  ansible.builtin.package:
+    - name: irods-rule-engine-plugin-python{{ irods_package_extension }}
+    - state: present
+
+- name: Ensure /etc/irods/core.py is present
+  ansible.builtin.file:
+    path: /etc/irods/core.py
+    owner: irods
+    group: irods
+    mode: "0644"
+    state: touch
