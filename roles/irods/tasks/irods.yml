@@ -1,5 +1,10 @@
 ---
 
+- name: Install ies plugins du catalogue
+  ansible.builtin.include_tasks: install-plugin-rule-engine-python.yml
+  when:
+    - "'python' in (irods_rule_engines | map(attribute='configuration') | list)"
+
 - name: Install iRODS server configuration file
   ansible.builtin.template:
     src: "templates/{{ irods_config_schema_version }}/server_config.json.j2"

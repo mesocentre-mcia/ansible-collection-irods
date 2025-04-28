@@ -19,3 +19,31 @@ irods_icommands_pkgname: "irods-icommands{{ irods_package_extension }}"
 
 irods_database_pkgname: |
   irods-database-plugin-postgres{{ irods_package_extension }}
+
+irods_rule_engines_configurations:
+  irods_rule_language:
+    instance_name: irods_rule_engine_plugin-irods_rule_language-instance
+    plugin_name: irods_rule_engine_plugin-irods_rule_language
+    plugin_specific_configuration:
+      re_data_variable_mapping_set:
+        - core
+      re_function_name_mapping_set:
+        - core
+      re_rulebase_set:
+        - core
+      regexes_for_supported_peps:
+        - "ac[^ ]*"
+        - "msi[^ ]*"
+        - "[^ ]*pep_[^ ]*_(pre|post|except|finally)"
+
+    shared_memory_instance: irods_rule_language_rule_engine
+
+  cpp_default_policy:
+    instance_name: irods_rule_engine_plugin-cpp_default_policy-instance
+    plugin_name: irods_rule_engine_plugin-cpp_default_policy
+    plugin_specific_configuration: {}
+
+  python:
+    instance_name: irods_rule_engine_plugin-python-instance,
+    plugin_name: irods_rule_engine_plugin-python,
+    plugin_specific_configuration: {}

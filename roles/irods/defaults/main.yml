@@ -52,4 +52,14 @@ irods_ssl_dh_params_file: "{{ irods_ssl_default_directory }}/dhparams.pem"
 irods_server_requirements_pkgs: []
 irods_ies_requirements_pkgs: []
 
-irods_ies_plugins: []
+irods_rule_engines_extra_configurations: {}
+
+irods_rule_engines:
+  - name: irods_rule_engine_plugin-irods_rule_language-instance
+    configuration: irods_rule_language
+
+  - name: irods_rule_engine_plugin-cpp_default_policy-instance
+    configuration: cpp_default_policy
+
+# plugin versions
+irods_rule_engine_python_version: ".0"
