@@ -1,6 +1,6 @@
 {
   "admin_password": "{{ irods_admin_password }}",
-  "host_access_control": {% include irods_config_schema_version + "/host_access_control_config.json.j2" %},
+  "host_access_control": {% include "host_access_control_config.json.j2" %},
   "host_system_information": {
     "service_account_user_name": "irods",
     "service_account_group_name": "irods"
