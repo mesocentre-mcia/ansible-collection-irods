@@ -1,5 +1,4 @@
 ---
-
 - name: Install ies plugins du catalogue
   ansible.builtin.include_tasks: install-plugin-rule-engine-python.yml
   when:
@@ -17,7 +16,7 @@
 
 - name: Install iRODS hosts configuration file
   ansible.builtin.template:
-    src: "templates/hosts_config.json.j2"
+    src: "templates/{{ irods_config_schema_version }}/hosts_config.json.j2"
     dest: "/etc/irods/hosts_config.json"
     mode: "0644"
     owner: irods
@@ -83,6 +82,16 @@
     group: irods
   notify:
     - Restart irods
+  when: irods_config_schema_version != "v5"
+
+- name: Install iRODS systemd service file
+  ansible.builtin.template:
+    src: "templates/{{ irods_config_schema_version }}/irods.service.j2"
+    dest: "/lib/systemd/system/irods.service"
+    mode: "0644"
+    owner: root
+    group: root
+  when: irods_config_schema_version == "v5"
 
 - name: Set correct acPreconnect rule for server to be able to connect to zone
   ansible.builtin.lineinfile:
