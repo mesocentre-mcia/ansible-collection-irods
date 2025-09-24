@@ -19,3 +19,7 @@ irods_icommands_pkgname_short: "irods-icommands"
 # yamllint disable-line rule:line-length
 irods_database_pkgname: "irods-database-plugin-postgres{{ irods_package_extension }}"
 irods_database_pkgname_short: "irods-database-plugin-postgres"
+#FIXME automatically determine the major version A.B but without the minor version
+irods_s3_plugin_pkgname: "irods-resource-plugin-s3=5.0*"
+irods_s3_plugin_pkgname_short: "irods-resource-plugin-s3"
+
