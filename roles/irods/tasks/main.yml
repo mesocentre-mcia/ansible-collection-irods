@@ -43,14 +43,14 @@
     state: present
   when: ansible_distribution == 'Ubuntu' or ansible_distribution == 'Debian'
 
-- name: Setup iRODS Ubuntu 18.04 (bionic) apt repository
+- name: Setup iRODS Ubuntu apt repository
   ansible.builtin.apt_repository:
     filename: "renci-irods"
-    repo: "deb [arch=amd64] https://packages.irods.org/apt/ bionic main"
+    repo: "deb [arch=amd64] https://packages.irods.org/apt/ {{ ansible_distribution_release }} main"
     state: present
   when:
     - ansible_distribution == 'Ubuntu'
-    - ansible_distribution_version == '18.04'
+#    - ansible_distribution_version == '18.04'
 
 - name: Install iRODS server requirements packages
   ansible.builtin.package:
