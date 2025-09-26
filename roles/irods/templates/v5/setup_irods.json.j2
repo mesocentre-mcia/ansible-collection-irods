@@ -1,0 +1,13 @@
+{
+  "admin_password": "{{ irods_admin_password }}",
+  "host_access_control": {% include "host_access_control_config.json.j2" %},
+  "host_system_information": {
+    "service_account_user_name": "irods",
+    "service_account_group_name": "irods"
+  },
+  "server_config": {% include irods_config_schema_version + "/server_config.json.j2" %},
+  "service_account_environment": {% include irods_config_schema_version + "/service_account_irods_environment.json.j2" %},
+  "default_resource_directory": "/var/lib/irods/Vault",
+  "default_resource_name": "{{ irods_default_resource_name }}"
+}
+

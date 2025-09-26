@@ -124,7 +124,7 @@
 
 - name: Install iRODS server setup file
   ansible.builtin.template:
-    src: "templates/setup_irods.json.j2"
+    src: "templates/{{ irods_config_schema_version }}/setup_irods.json.j2"
     dest: "/etc/irods/setup_irods.json"
     mode: "0600"
     owner: irods

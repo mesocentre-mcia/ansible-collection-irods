@@ -1,0 +1,17 @@
+[Unit]
+Description=iRODS
+After=network.target
+
+[Service]
+Type=notify-reload
+ExecStart=/usr/sbin/irodsServer
+KillMode=mixed
+Restart=on-failure
+User=irods
+Group=irods
+WorkingDirectory=/var/lib/irods
+RuntimeDirectory=irods
+LimitNOFILE=1048576
+
+[Install]
+WantedBy=multi-user.target
