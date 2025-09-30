@@ -41,6 +41,10 @@ options:
         description: resource physical path
         type: str
         required: false
+      context:
+        description: resource context
+        type: str
+        required: false
       children:
         description: list of resource children trees (if appropriate)
         type: list

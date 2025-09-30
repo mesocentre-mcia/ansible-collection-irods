@@ -55,6 +55,9 @@ resc_trees:
     RESC_ZONE_NAME:
        description: resource zone
        type: str
+    RESC_CONTEXT:
+       description: resource context
+       type: str
    children:
       description: resource children trees (if appropriate)
       type: list

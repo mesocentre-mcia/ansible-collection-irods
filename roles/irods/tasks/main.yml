@@ -106,6 +106,47 @@
   when:
     - ansible_distribution == 'Ubuntu' or ansible_distribution == 'Debian'
 
+- name: S3 resource plugin package installation
+  ansible.builtin.package:
+    pkg:
+      - "{{ irods_s3_plugin_pkgname }}"
+  become: true
+  loop: "{{ irods_resc_trees | mcia.irods.filter_resc(type='s3',
+    loc=inventory_hostname) }}"
+  when:
+    - "item.loc is defined"
+    - "item.path is defined"
+  loop_control:
+    label: "{{ item.loc }}:{{ item.path }}"
+
+- name: Ensure iRODS S3 resource plugin packages are version-locked (RedHat)
+  community.general.yum_versionlock:
+    state: present
+    name: "{{ irods_s3_plugin_pkgname_short }}"
+  become: true
+  loop: "{{ irods_resc_trees | mcia.irods.filter_resc(type='s3',
+    loc=inventory_hostname) }}"
+  when:
+    - "item.loc is defined"
+    - "item.path is defined"
+    - ansible_os_family == 'RedHat'
+  loop_control:
+    label: "{{ item.loc }}:{{ item.path }}"
+
+- name: Ensure iRODS S3 resource plugin packages are version-locked (Ubuntu / Debian)
+  ansible.builtin.dpkg_selections:
+    selection: hold
+    name: "{{ irods_s3_plugin_pkgname_short }}"
+  become: true
+  loop: "{{ irods_resc_trees | mcia.irods.filter_resc(type='s3',
+    loc=inventory_hostname) }}"
+  when:
+    - "item.loc is defined"
+    - "item.path is defined"
+    - ansible_distribution == 'Ubuntu' or ansible_distribution == 'Debian'
+  loop_control:
+    label: "{{ item.loc }}:{{ item.path }}"
+
 - name: Reload systemd to generate the sysv service support
   ansible.builtin.systemd_service:
     daemon_reload: true
