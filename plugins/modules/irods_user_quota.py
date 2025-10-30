@@ -98,10 +98,10 @@ def get_quotas(module):
 
     r, o, e = module.run_command(iquest(['--no-page', fmt, cmd]))
 
-    if r != 0:
+    if (r!= 1 and r != 0) or (r==1 and 'CAT_NO_ROWS_FOUND' not in o):
         module.fail_json(
-            msg='iquest cmd=\'%s\' failed with code=%s error=\'%s\'' %
-            (cmd, r, e)
+            msg='iquest fmt=\'%s\' cmd=\'%s\' failed with code=%s output=\'%s\' error=\'%s\'' %
+            (fmt, cmd, r, o, e)
         )
 
     if 'CAT_NO_ROWS_FOUND' in o:
