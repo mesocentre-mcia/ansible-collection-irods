@@ -89,11 +89,11 @@ def get_quotas(module):
     where = ['QUOTA_USER_TYPE <> \'rodsgroup\'']
 
     if (module.params['zone'] is not None):
-        where += 'QUOTA_USER_ZONE = \'%s\'' % module.params['zone']
+        where += ['QUOTA_USER_ZONE = \'%s\'' % module.params['zone']]
 
     cmd = 'select {} where {}'.format(
         ', '.join(_QUOTA_FIELDS),
-        'and'.join(where)
+        ' and '.join(where)
     )
 
     r, o, e = module.run_command(iquest(['--no-page', fmt, cmd]))
