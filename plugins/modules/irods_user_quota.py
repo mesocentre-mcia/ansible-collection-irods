@@ -86,7 +86,7 @@ def get_quotas(module):
 
     fmt = ':'.join(['%s'] * len(_QUOTA_FIELDS))
 
-    where = ['QUOTA_USER_TYPE <> \'rodsgroup\'']
+    where = []
 
     if (module.params['zone'] is not None):
         where += ['QUOTA_USER_ZONE = \'%s\'' % module.params['zone']]
