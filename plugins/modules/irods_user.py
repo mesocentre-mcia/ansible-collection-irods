@@ -127,8 +127,13 @@ def params_to_users(params):
     for k, v in _USER_PARAM_FIELDS.items():
         if params[k] is not None:
             skel[v] = params[k]
-
-    names = params['names'] or [params['name']]
+ 
+    if params['names'] is not None:
+        names = params['names']
+    elif params['name'] is not None:
+        names = [params['name']]
+    else:
+        raise Exception("No username given (Should not happen according to module logic)")
 
     users = {}
 
