@@ -15,3 +15,8 @@
   ansible.builtin.systemd_service:
     name: irods
     state: restarted
+
+- name: Reload rsyslog
+  ansible.builtin.systemd_service:
+    name: rsyslog
+    state: reloaded
