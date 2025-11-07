@@ -24,6 +24,41 @@
   notify:
     - Restart irods
 
+- name: Configure rsyslog
+  ansible.builtin.copy:
+    dest: /etc/rsyslog.d/00-irods.conf
+    content: |
+      $FileCreateMode 0644
+      $DirCreateMode 0755
+      $Umask 0000
+      $template irods_format,"%msg%\n"
+      :programname,startswith,"irodsServer" /var/log/irods/irods.log;irods_format
+      & stop
+      :programname,startswith,"irodsDelayServer" /var/log/irods/irods.log;irods_format
+      & stop
+      :programname,startswith,"irodsAgent" /var/log/irods/irods.log;irods_format
+      & stop
+    mode: 644
+  notify:
+    - Reload rsyslog
+    - Restart irods
+
+- name: Configure logrotate
+  ansible.builtin.copy:
+    dest: /etc/logrotate.d/irods
+    content: |
+      /var/log/irods/irods.log {
+          weekly
+          rotate 26
+          copytruncate
+          delaycompress
+          compress
+          dateext
+          notifempty
+          missingok
+          su root root
+      }
+
 - name: Install iRODS host acces control configuration file
   ansible.builtin.template:
     src: "templates/host_access_control_config.json.j2"
