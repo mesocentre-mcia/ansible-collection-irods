@@ -243,7 +243,10 @@ def main():
         module.exit_json(**result)
 
     for k, v in user_quotas.items():
-        w = got_users[k]
+        if k in got_users:
+            w = got_users[k]
+        else:
+            w = {}
         if v != w:
             result['operations'].append(qprint(v, 'u'))
             set_user_quota(module,
@@ -254,7 +257,10 @@ def main():
             
 
     for k, v in group_quotas.items():
-        w = got_groups[k]
+        if k in got_groups:
+            w = got_groups[k]
+        else:
+            w = {}
         if v != w:
             result['operations'].append(qprint(v, 'g'))
             set_group_quota(module,
