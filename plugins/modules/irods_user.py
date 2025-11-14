@@ -155,7 +155,13 @@ def users_to_string(users):
 def delete_user(module, user):
     iadmin = IrodsAdmin()
 
-    cmd = ['rmuser', user['USER_NAME']]
+    user_name = user['USER_NAME']
+    if user['USER_TYPE'] == 'rodsgroup':
+        cmd = ['rmgroup', user_name]
+    else:
+        if 'USER_ZONE' in user:
+            user_name += '#' + user['USER_ZONE']
+        cmd = ['rmuser', user_name]
     r, o, e = module.run_command(iadmin(cmd))
 
     if r != 0:
@@ -169,10 +175,12 @@ def add_user(module, user):
     iadmin = IrodsAdmin()
 
     user_name = user['USER_NAME']
-    if 'USER_ZONE' in user:
-        user_name += '#' + user['USER_ZONE']
-
-    cmd = ['mkuser', user_name , user['USER_TYPE']]
+    if user['USER_TYPE'] == 'rodsgroup':
+        cmd = ['mkgroup', user_name]
+    else:
+        if 'USER_ZONE' in user:
+            user_name += '#' + user['USER_ZONE']
+        cmd = ['mkuser', user_name , user['USER_TYPE']]
     r, o, e = module.run_command(iadmin(cmd))
 
     if r != 0:
