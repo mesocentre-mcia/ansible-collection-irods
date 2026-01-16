@@ -230,7 +230,7 @@ def main():
     got_groups = {k: v.copy() for k, v in got.items() if k in group_quotas}
 
 
-    if got_users != user_quotas | got_groups !=group_quotas:
+    if got_users != user_quotas or got_groups != group_quotas:
         result['changed'] = True
 
     if module._diff:
