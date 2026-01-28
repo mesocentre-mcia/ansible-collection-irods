@@ -100,6 +100,12 @@ class IrodsQuest(IrodsCommand):
         return 'iquest'
 
 
+class IrodsRule(IrodsCommand):
+
+    def _command(self):
+        return 'irule'
+
+
 class IrodsEnv(IrodsCommand):
 
     def _command(self):
