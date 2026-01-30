@@ -47,3 +47,5 @@ irods_rule_engines_configurations:
     instance_name: irods_rule_engine_plugin-python-instance,
     plugin_name: irods_rule_engine_plugin-python,
     plugin_specific_configuration: {}
+
+irods_plugin_logical_quotas_pkgname: "irods-rule-engine-plugin-logical-quotas"
