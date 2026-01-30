@@ -84,6 +84,43 @@ with random/hard to guess values:
 * `irods_negotiation_key`: has to be a 32 bytes long string
 * `irods_server_control_plane_key`: has to be a 32 bytes long string
 
+
+Rule engines default configuration:
+```
+irods_rule_engines:
+  - name: irods_rule_engine_plugin-irods_rule_language-instance
+    configuration: irods_rule_language
+
+  - name: irods_rule_engine_plugin-cpp_default_policy-instance
+    configuration: cpp_default_policy
+```
+
+To add a rule engine, for exemple to enable logical quota:
+```
+irods_rule_engines:
+  - name: irods_rule_engine_plugin-logical_quotas-instance
+    configuration: logical_quotas
+
+  - name: irods_rule_engine_plugin-irods_rule_language-instance
+    configuration: irods_rule_language
+
+  - name: irods_rule_engine_plugin-cpp_default_policy-instance
+    configuration: cpp_default_policy
+
+irods_rule_engines_extra_configurations:
+  logical_quotas:
+    instance_name: irods_rule_engine_plugin-logical_quotas-instance
+    plugin_name: irods_rule_engine_plugin-logical_quotas
+    plugin_specific_configuration:
+      namespace: irods::logical_quotas
+      metadata_attribute_names:
+        maximum_number_of_data_objects: maximum_number_of_data_objects
+        maximum_size_in_bytes: maximum_size_in_bytes
+        total_number_of_data_objects: total_number_of_data_objects
+        total_size_in_bytes: total_size_in_bytes
+```
+
+
 Example Playbook
 ----------------
 

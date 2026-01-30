@@ -16,3 +16,5 @@ irods_icommands_pkgname: "irods-icommands{{ irods_package_extension }}"
 
 irods_database_pkgname: |
   irods-database-plugin-postgres{{ irods_package_extension }}
+
+irods_plugin_logical_quotas_pkgname: "irods-rule-engine-plugin-logical-quotas{{ irods_package_extension }}"

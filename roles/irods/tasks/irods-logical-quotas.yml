@@ -1,0 +1,30 @@
+---
+# tasks file for role logical_quotas
+- name: Logical quotas | Include OS-specific variables
+  ansible.builtin.include_vars: "{{ logical_quota_var }}"
+  with_first_found:
+    - "{{ ansible_distribution }}-{{ ansible_distribution_major_version }}.yml"
+    - "{{ ansible_os_family }}-{{ ansible_distribution_major_version }}.yml"
+    - "{{ ansible_distribution }}.yml"
+    - "{{ ansible_os_family }}.yml"
+  loop_control:
+    loop_var: logical_quota_var
+
+- name: Logical quotas | Install iRODS logical quotas plugin
+  ansible.builtin.package:
+    pkg: "{{ irods_plugin_logical_quotas_pkgname }}"
+  notify: Restart irods
+
+- name: Logical quotas | Ensure iRODS server packages are version-locked (RedHat)
+  community.general.yum_versionlock:
+    state: present
+    name: "{{ irods_plugin_logical_quotas_pkgname }}"
+  when: ansible_os_family == 'RedHat'
+
+- name: Logical quotas | Ensure iRODS server packages are version-locked (Ubuntu / Debian)
+  ansible.builtin.dpkg_selections:
+    selection: hold
+    name: "{{ irods_plugin_logical_quotas_pkgname }}"
+  when:
+    - ansible_distribution == 'Ubuntu' or ansible_distribution == 'Debian'
+
