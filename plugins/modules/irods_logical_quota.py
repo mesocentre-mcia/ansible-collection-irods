@@ -156,18 +156,20 @@ def add_specific_query_logical_quotas(module):
         cmd = ['--no-page', '--sql', 'lsl', specific_queries[specific_query] ]
         r, o, e = module.run_command(iquest(cmd))
 
-        if r != 0:
+        # iquest returns rc=1 for CAT_NO_ROWS_FOUND in non-interactive mode (no TTY).
+        # The message may appear in stdout or stderr depending on the iRODS version.
+        if r != 0 and 'CAT_NO_ROWS_FOUND' not in o and 'CAT_NO_ROWS_FOUND' not in e:
             module.fail_json(
                 msg='iquest cmd=\'%s\' failed with code=%s error=\'%s\'' %
                 (cmd, r, e)
             )
 
-        if 'CAT_NO_ROWS_FOUND' in o:
-            # add query if necessery
-            cmd = ['asq', specific_query]
+        if 'CAT_NO_ROWS_FOUND' in o or 'CAT_NO_ROWS_FOUND' in e:
+            # add query if necessary: iadmin asq 'SQL query' [Alias]
+            cmd = ['asq', specific_queries[specific_query], specific_query]
             r, o, e = module.run_command(iadmin(cmd))
 
-            if r != 0:
+            if r != 0 and 'CATALOG_ALREADY_HAS_ITEM_BY_THAT_NAME' not in e and 'CAT_INVALID_ARGUMENT' not in e:
                 module.fail_json(
                     msg='iadmin cmd=\'%s\' failed with code=%s error=\'%s\'' %
                     (cmd, r, e)
