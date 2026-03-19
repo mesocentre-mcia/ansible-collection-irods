@@ -152,10 +152,6 @@
   when:
     - "'irods_rule_engine_plugin-logical_quotas-instance' in item.name"
 
-- name: Reload systemd to generate the sysv service support
-  ansible.builtin.systemd_service:
-    daemon_reload: true
-
 - name: Ensure iRODS various directories ownership
   ansible.builtin.file:
     path: "{{ item }}"
@@ -197,20 +193,18 @@
   when:
     - irods_cs_ssl
 
-# do this first because it's nice to have a running catalog when you want to
-# start a resource server
-
 - name: Initialize iRODS distribution for IES (catalog server)
   ansible.builtin.include_tasks: irods-configure-ies.yml
   when:
     - ansible_role_irods_is_catalog
-
-# trigger handlers for catalog
-- name: Flush handlers
-  ansible.builtin.meta: flush_handlers
 
 # then configure other servers
 - name: Initialize iRODS distribution for non-IES (resource only server)
   ansible.builtin.include_tasks: irods-configure-nonies.yml
   when:
     - not ansible_role_irods_is_catalog
+
+- name: Reload systemd to generate the sysv service support
+  ansible.builtin.systemd_service:
+    daemon_reload: true
+
