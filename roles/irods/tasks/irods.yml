@@ -126,7 +126,7 @@
     mode: "0644"
     owner: root
     group: root
-  when: irods_config_schema_version == "v5"
+  when: (irods_config_schema_version == "v5") or (irods_config_schema_version == "v4")
 
 - name: Set correct acPreconnect rule for server to be able to connect to zone
   ansible.builtin.lineinfile:
