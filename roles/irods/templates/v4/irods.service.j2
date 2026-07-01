@@ -1,0 +1,25 @@
+[Unit]
+Description=iRODS
+After=network.target local-fs.target
+Requires=network.target
+
+[Service]
+Type=forking
+
+ExecStart=/var/lib/irods/irodsctl start
+ExecReload=/var/lib/irods/irodsctl restart
+ExecStop=/var/lib/irods/irodsctl stop
+
+Restart=on-failure
+RestartSec=5s
+
+User=irods
+Group=irods
+
+WorkingDirectory=/var/lib/irods
+Environment=HOME=/var/lib/irods
+
+LimitNOFILE=1048576
+
+[Install]
+WantedBy=multi-user.target
