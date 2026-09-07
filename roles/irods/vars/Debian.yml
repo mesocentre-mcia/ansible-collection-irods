@@ -1,5 +1,5 @@
 ---
-# vars file for Ubuntu
+# vars file for Debian
 
 # yamllint disable-line rule:line-length
 irods_package_extension: "{{ '' if irods_version is none else '=' + irods_version }}"
