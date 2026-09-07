@@ -36,20 +36,32 @@
     state: latest  # noqa package-latest
   when: ansible_distribution == 'Ubuntu' or ansible_distribution == 'Debian'
 
-- name: Setup iRODS Ubuntu / Debian apt repository key
-  ansible.builtin.apt_key:
-    id: 9014FF9F75C66C771F1CB574BD925DBDACF9B42B
-    url: https://packages.irods.org/irods-signing-key.asc
-    state: present
+- name: Create apt keyrings directory (Ubuntu / Debian)
+  ansible.builtin.file:
+    path: /etc/apt/keyrings
+    state: directory
+    mode: '0755'
   when: ansible_distribution == 'Ubuntu' or ansible_distribution == 'Debian'
 
-- name: Setup iRODS Ubuntu apt repository
+- name: Setup iRODS apt repository key (Ubuntu / Debian)
+  ansible.builtin.get_url:
+    url: https://packages.irods.org/irods-signing-key.asc
+    dest: /etc/apt/keyrings/renci-irods-archive-keyring.pgp
+    mode: '0644'
+    checksum: "sha256:0d4580bfd1a0c1c92036d76d4e3d59a9dfb01aaf8d80c3c3d2bc7796377b89b6"
+  when: ansible_distribution == 'Ubuntu' or ansible_distribution == 'Debian'
+
+- name: Setup iRODS apt repository (Ubuntu / Debian)
   ansible.builtin.apt_repository:
     filename: "renci-irods"
-    repo: "deb [arch=amd64] https://packages.irods.org/apt/ {{ ansible_distribution_release }} main"
+    repo: >
+      deb [signed-by=/etc/apt/keyrings/renci-irods-archive-keyring.pgp arch=amd64]
+      https://packages.irods.org/apt/
+      {{ ansible_distribution_release }}
+      main
     state: present
-  when:
-    - ansible_distribution == 'Ubuntu'
+    update_cache: true
+  when: ansible_distribution == 'Ubuntu' or ansible_distribution == 'Debian'
 
 - name: Install iRODS server requirements packages
   ansible.builtin.package:
