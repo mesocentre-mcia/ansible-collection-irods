@@ -72,15 +72,6 @@
     pkg: "{{ irods_ies_requirements_pkgs }}"
   when: ansible_role_irods_is_catalog
 
-- name: Setup iRODS Debian 12 (bookworm) apt repository
-  ansible.builtin.apt_repository:
-    filename: "renci-irods"
-    repo: "deb [arch=amd64] https://packages.irods.org/apt/ bookworm main"
-    state: present
-  when:
-    - ansible_distribution == 'Debian'
-    - ansible_distribution_major_version == '12'
-
 - name: Install iRODS server packages
   ansible.builtin.package:
     pkg:
