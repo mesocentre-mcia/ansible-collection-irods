@@ -115,10 +115,10 @@
         "resource" : {},
         "rule_engines": [
 {% for engine in irods_rule_engines %}
-{{ irods_rule_engines_extra_configurations.get(
-       engine.configuration,
-       irods_rule_engines_configurations[engine.configuration]
-   )
+{% set engine_config = irods_rule_engines_extra_configurations[engine.configuration]
+                       if engine.configuration in irods_rule_engines_extra_configurations
+                       else irods_rule_engines_configurations[engine.configuration] %}
+{{ engine_config
    | to_nice_json
    | indent('            ', first=True)
 }}{% if not loop.last %},{% endif +%}
