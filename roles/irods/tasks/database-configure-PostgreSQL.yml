@@ -9,7 +9,7 @@
 
 - name: Add irods user to iRODS database
   community.postgresql.postgresql_user:
-    db: "{{ irods_db_name }}"
+    login_db: "{{ irods_db_name }}"
     name: "{{ irods_db_username }}"
     password: "{{ irods_db_password }}"
   no_log: true
@@ -17,7 +17,7 @@
   become: true
 - name: Give irods user privileges to iRODS database
   community.postgresql.postgresql_privs:
-    db: "{{ irods_db_name }}"
+    login_db: "{{ irods_db_name }}"
     role: "{{ irods_db_username }}"
     type: database
     privs: ALL
@@ -25,7 +25,7 @@
   become: true
 - name: Give irods user privileges to public schema
   community.postgresql.postgresql_privs:
-    db: "{{ irods_db_name }}"
+    login_db: "{{ irods_db_name }}"
     role: "{{ irods_db_username }}"
     type: schema
     obj: public
