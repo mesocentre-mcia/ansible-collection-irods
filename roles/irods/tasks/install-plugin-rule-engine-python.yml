@@ -7,6 +7,23 @@
       {{ irods_rule_engine_python_version }}"
     state: present
 
+- name: Ensure Python Rule Engine Plugin package is version-locked (RedHat)
+  community.general.yum_versionlock:
+    state: present
+    name: "irods-rule-engine-plugin-python\
+      {{ irods_package_extension }}\
+      {{ irods_rule_engine_python_version }}"
+  when: ansible_os_family == 'RedHat'
+
+- name: Ensure Python Rule Engine Plugin package is version-locked (Ubuntu / Debian)
+  ansible.builtin.dpkg_selections:
+    selection: hold
+    name: "irods-rule-engine-plugin-python\
+      {{ irods_package_extension }}\
+      {{ irods_rule_engine_python_version }}"
+  when:
+    - ansible_distribution == 'Ubuntu' or ansible_distribution == 'Debian'
+
 - name: Ensure /etc/irods/core.py is present
   ansible.builtin.file:
     path: /etc/irods/core.py
